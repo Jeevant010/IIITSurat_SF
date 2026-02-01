@@ -321,7 +321,9 @@ export async function forceDeletePlayer(userId: string) {
     }
 
     // Delete all join requests
-    await JoinRequest.deleteMany({ userId: new mongoose.Types.ObjectId(userId) });
+    await JoinRequest.deleteMany({
+      userId: new mongoose.Types.ObjectId(userId),
+    });
 
     // Delete user
     await User.findByIdAndDelete(userId);
