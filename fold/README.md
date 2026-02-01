@@ -5,6 +5,7 @@
 ## ✨ Features
 
 ### 🎯 For Players
+
 - **Team Creation**: Create your own team and become a leader
 - **Team Browsing**: Explore all available teams with descriptions
 - **Join Requests**: Request to join teams with approval system
@@ -12,12 +13,14 @@
 - **Team Dashboard**: Manage your team and members
 
 ### 👑 For Team Leaders
+
 - **Member Management**: Approve/reject join requests
 - **Team Settings**: Edit team name, description, and details
 - **Member Removal**: Remove inactive team members
 - **Team Code Sharing**: Share unique team codes
 
 ### 🛡️ For Admins (God Mode)
+
 - **Player Management**: Full CRUD operations, bulk CSV import from Google Sheets
 - **Team Management**: Complete control over all teams
 - **Force Actions**: Override restrictions and approvals
@@ -25,6 +28,7 @@
 - **Analytics Dashboard**: View comprehensive stats
 
 ### 🎨 UI/UX Features
+
 - **Entertaining Loading Screens**: 20+ funny messages for free-tier delays (1-2 min loads)
 - **Gradient Designs**: Purple/pink theme for Spring Fiesta vibes
 - **Smooth Animations**: Framer Motion powered transitions
@@ -33,6 +37,7 @@
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18+ installed
 - MongoDB Atlas account (or local MongoDB)
 
@@ -81,13 +86,16 @@ npm run dev
 ## 🎨 Key Features Implemented
 
 ### 1. Fun Loading Screens
+
 Free tier takes 1-2+ minutes to load? No problem! We have:
+
 - 20+ rotating funny messages
 - Animated progress bars
 - Icon animations
 - Entertainment while waiting
 
 ### 2. Google Sheets Import
+
 1. Export Google Sheet as CSV
 2. Navigate to Admin → Players
 3. Upload CSV file
@@ -95,13 +103,16 @@ Free tier takes 1-2+ minutes to load? No problem! We have:
 5. Bulk import hundreds of players
 
 ### 3. Join Request System
+
 - Players request to join teams
 - Leaders approve/reject in team dashboard
 - Admins can force-approve
 - Automatic team size limits (max 5)
 
 ### 4. Admin God Mode
+
 Complete control panel:
+
 - Create/edit/delete players
 - Force-add to teams
 - Change team leaders
@@ -111,6 +122,7 @@ Complete control panel:
 ## 🚢 Deployment
 
 ### Vercel (Recommended)
+
 1. Push to GitHub
 2. Import on [vercel.com](https://vercel.com)
 3. Add `MONGODB_URI` environment variable
