@@ -133,12 +133,22 @@ function GroupTable({
         <Table className="min-w-[400px]">
           <TableHeader>
             <TableRow className="border-zinc-800">
-              <TableHead className="text-zinc-400 w-6 md:w-8 px-1 md:px-2">#</TableHead>
+              <TableHead className="text-zinc-400 w-6 md:w-8 px-1 md:px-2">
+                #
+              </TableHead>
               <TableHead className="text-zinc-400 px-1 md:px-2">Team</TableHead>
-              <TableHead className="text-zinc-400 text-center px-1 md:px-2">P</TableHead>
-              <TableHead className="text-zinc-400 text-center px-1 md:px-2">W</TableHead>
-              <TableHead className="text-zinc-400 text-center px-1 md:px-2">L</TableHead>
-              <TableHead className="text-zinc-400 text-center px-1 md:px-2">⭐</TableHead>
+              <TableHead className="text-zinc-400 text-center px-1 md:px-2">
+                P
+              </TableHead>
+              <TableHead className="text-zinc-400 text-center px-1 md:px-2">
+                W
+              </TableHead>
+              <TableHead className="text-zinc-400 text-center px-1 md:px-2">
+                L
+              </TableHead>
+              <TableHead className="text-zinc-400 text-center px-1 md:px-2">
+                ⭐
+              </TableHead>
               <TableHead className="text-zinc-400 text-center font-bold px-1 md:px-2">
                 Pts
               </TableHead>
@@ -161,8 +171,12 @@ function GroupTable({
                 </TableCell>
                 <TableCell className="text-white font-medium px-1 md:px-2">
                   <div className="flex items-center gap-1 md:gap-2">
-                    {idx === 0 && <Crown className="w-3 h-3 md:w-4 md:h-4 text-yellow-400 flex-shrink-0" />}
-                    <span className="truncate text-sm md:text-base">{team.teamName}</span>
+                    {idx === 0 && (
+                      <Crown className="w-3 h-3 md:w-4 md:h-4 text-yellow-400 flex-shrink-0" />
+                    )}
+                    <span className="truncate text-sm md:text-base">
+                      {team.teamName}
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell className="text-center text-zinc-300 text-sm px-1 md:px-2">

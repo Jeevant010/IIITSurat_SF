@@ -74,7 +74,9 @@ export default async function LeaderboardPage({
             <Trophy className="w-7 h-7 md:w-10 md:h-10 text-yellow-400" />
             Leaderboard
           </h1>
-          <p className="text-sm md:text-base text-zinc-400">Spring Fiesta 2026 Rankings</p>
+          <p className="text-sm md:text-base text-zinc-400">
+            Spring Fiesta 2026 Rankings
+          </p>
         </div>
 
         {/* Tab Switcher */}
@@ -224,14 +226,20 @@ export default async function LeaderboardPage({
             {/* Full Team Rankings Table */}
             <Card className="border-purple-500/20 bg-zinc-950/80">
               <CardHeader className="px-3 md:px-6">
-                <CardTitle className="text-white text-lg md:text-xl">Full Rankings</CardTitle>
+                <CardTitle className="text-white text-lg md:text-xl">
+                  Full Rankings
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-2 md:p-6 overflow-x-auto">
                 <Table className="min-w-[500px]">
                   <TableHeader>
                     <TableRow className="border-zinc-800 hover:bg-transparent">
-                      <TableHead className="w-12 md:w-16 text-zinc-400 text-xs md:text-sm">Rank</TableHead>
-                      <TableHead className="text-zinc-400 text-xs md:text-sm">Team</TableHead>
+                      <TableHead className="w-12 md:w-16 text-zinc-400 text-xs md:text-sm">
+                        Rank
+                      </TableHead>
+                      <TableHead className="text-zinc-400 text-xs md:text-sm">
+                        Team
+                      </TableHead>
                       <TableHead className="text-center text-zinc-400 text-xs md:text-sm">
                         W/L
                       </TableHead>
@@ -342,10 +350,18 @@ export default async function LeaderboardPage({
               <Table className="min-w-[500px]">
                 <TableHeader>
                   <TableRow className="border-zinc-800 hover:bg-transparent">
-                    <TableHead className="text-zinc-400 text-xs md:text-sm">Player</TableHead>
-                    <TableHead className="text-zinc-400 text-xs md:text-sm">Roll Number</TableHead>
-                    <TableHead className="text-zinc-400 text-xs md:text-sm">Team</TableHead>
-                    <TableHead className="text-zinc-400 text-xs md:text-sm">Role</TableHead>
+                    <TableHead className="text-zinc-400 text-xs md:text-sm">
+                      Player
+                    </TableHead>
+                    <TableHead className="text-zinc-400 text-xs md:text-sm">
+                      Roll Number
+                    </TableHead>
+                    <TableHead className="text-zinc-400 text-xs md:text-sm">
+                      Team
+                    </TableHead>
+                    <TableHead className="text-zinc-400 text-xs md:text-sm">
+                      Role
+                    </TableHead>
                     <TableHead className="text-right text-zinc-400 text-xs md:text-sm">
                       IGN
                     </TableHead>

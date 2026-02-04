@@ -107,7 +107,8 @@ export default function TeamsPage() {
           <div className="flex gap-3 md:gap-4 justify-center flex-wrap">
             <Link href="/teams/create">
               <Button className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black font-bold text-sm md:text-lg px-4 md:px-8 py-4 md:py-6">
-                <Plus className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2" /> Create Clan
+                <Plus className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2" /> Create
+                Clan
               </Button>
             </Link>
             <Link href="/teams/my-team">
