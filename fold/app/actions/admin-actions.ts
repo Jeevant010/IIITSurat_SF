@@ -2,9 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import connectDB from "@/lib/mongodb";
-import User from "@/lib/models/User";
-import Team from "@/lib/models/Team";
-import JoinRequest from "@/lib/models/JoinRequest";
+import {
+  User,
+  Team,
+  JoinRequest,
+  SiteSettings,
+  Announcement,
+} from "@/lib/models";
 import mongoose from "mongoose";
 
 // GOD MODE: Force add user to team (bypasses approval)
@@ -361,5 +365,400 @@ export async function forceCreatePlayer(data: {
   } catch (error) {
     console.error(error);
     return { success: false, message: "Failed to create player" };
+  }
+}
+
+// ===================================================
+// TEAM CREATION BY ADMIN
+// ===================================================
+
+// GOD MODE: Create team directly as admin
+export async function forceCreateTeam(data: {
+  name: string;
+  teamCode: string;
+  description?: string;
+  leaderId?: string; // Optional - if not provided, creates empty team
+  maxMembers?: number;
+}) {
+  await connectDB();
+
+  try {
+    // Check if team name exists
+    const existingName = await Team.findOne({
+      name: { $regex: new RegExp(`^${data.name}$`, "i") },
+    });
+    if (existingName) {
+      return { success: false, message: "Team name already exists" };
+    }
+
+    // Check if team code exists
+    const existingCode = await Team.findOne({
+      teamCode: data.teamCode.toUpperCase(),
+    });
+    if (existingCode) {
+      return { success: false, message: "Team code already exists" };
+    }
+
+    // If leaderId is provided, verify and setup
+    let leaderId = null;
+    if (data.leaderId) {
+      const leader = await User.findById(data.leaderId);
+      if (!leader) {
+        return { success: false, message: "Selected leader not found" };
+      }
+      if (leader.teamId) {
+        return {
+          success: false,
+          message: "Selected user is already in a team",
+        };
+      }
+      leaderId = new mongoose.Types.ObjectId(data.leaderId);
+    }
+
+    // Create the team
+    const team = await Team.create({
+      name: data.name.trim(),
+      teamCode: data.teamCode.toUpperCase().trim(),
+      description: data.description || "",
+      leaderId: leaderId,
+      maxMembers: data.maxMembers || 5,
+      status: "ACTIVE",
+    });
+
+    // If leader was set, update user
+    if (leaderId) {
+      await User.findByIdAndUpdate(leaderId, {
+        teamId: team._id,
+        teamRole: "LEADER",
+      });
+    }
+
+    revalidatePath("/admin/teams");
+    revalidatePath("/teams");
+    return {
+      success: true,
+      message: "Team created successfully",
+      teamId: team._id.toString(),
+    };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Failed to create team" };
+  }
+}
+
+// ===================================================
+// SITE SETTINGS
+// ===================================================
+
+// Get current site settings
+export async function getSiteSettings() {
+  await connectDB();
+
+  try {
+    let settings = await SiteSettings.findOne().lean();
+
+    // Create default settings if none exist
+    if (!settings) {
+      settings = await SiteSettings.create({
+        siteName: "Spring Fiesta 2026 - Clash of Clans",
+        eventDate: new Date("2026-03-15"),
+        registrationOpen: true,
+        maxTeamSize: 5,
+        minTeamSize: 1,
+        allowTeamCreation: true,
+        allowJoinRequests: true,
+        heroTitle: "Clash of Clans Tournament",
+        heroSubtitle: "Spring Fiesta 2026 • IIIT Surat",
+        announcementBanner: "",
+      });
+      settings = settings.toObject();
+    }
+
+    return {
+      success: true,
+      settings: {
+        ...settings,
+        _id: settings._id?.toString(),
+        eventDate: settings.eventDate?.toISOString().split("T")[0],
+      },
+    };
+  } catch (error) {
+    console.error(error);
+    return { success: false, settings: null };
+  }
+}
+
+// Update site settings
+export async function updateSiteSettings(data: {
+  siteName?: string;
+  eventDate?: string;
+  registrationOpen?: boolean;
+  maxTeamSize?: number;
+  minTeamSize?: number;
+  allowTeamCreation?: boolean;
+  allowJoinRequests?: boolean;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  announcementBanner?: string;
+}) {
+  await connectDB();
+
+  try {
+    const updateData: any = { ...data };
+
+    // Convert eventDate string to Date
+    if (data.eventDate) {
+      updateData.eventDate = new Date(data.eventDate);
+    }
+
+    let settings = await SiteSettings.findOne();
+
+    if (settings) {
+      settings = await SiteSettings.findByIdAndUpdate(
+        settings._id,
+        updateData,
+        { new: true },
+      );
+    } else {
+      settings = await SiteSettings.create(updateData);
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/settings");
+    return { success: true, message: "Settings saved successfully" };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Failed to save settings" };
+  }
+}
+
+// ===================================================
+// ANNOUNCEMENTS
+// ===================================================
+
+// Create announcement
+export async function createAnnouncement(data: {
+  title: string;
+  content: string;
+  type?: "INFO" | "WARNING" | "SUCCESS" | "URGENT";
+  priority?: number;
+  isPinned?: boolean;
+  showOnBanner?: boolean;
+  targetAudience?: "ALL" | "TEAMS" | "FREE_AGENTS" | "ADMINS";
+  expiresAt?: string | null;
+}) {
+  await connectDB();
+
+  try {
+    const announcementData: any = {
+      ...data,
+      isActive: true,
+    };
+
+    if (data.expiresAt) {
+      announcementData.expiresAt = new Date(data.expiresAt);
+    }
+
+    await Announcement.create(announcementData);
+
+    revalidatePath("/admin/announcements");
+    revalidatePath("/");
+    return { success: true, message: "Announcement created" };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Failed to create announcement" };
+  }
+}
+
+// Update announcement
+export async function updateAnnouncement(
+  announcementId: string,
+  data: {
+    title?: string;
+    content?: string;
+    type?: "INFO" | "WARNING" | "SUCCESS" | "URGENT";
+    priority?: number;
+    isActive?: boolean;
+    isPinned?: boolean;
+    showOnBanner?: boolean;
+    targetAudience?: "ALL" | "TEAMS" | "FREE_AGENTS" | "ADMINS";
+    expiresAt?: string | null;
+  },
+) {
+  await connectDB();
+
+  try {
+    const updateData: any = { ...data };
+
+    if (data.expiresAt) {
+      updateData.expiresAt = new Date(data.expiresAt);
+    } else if (data.expiresAt === null) {
+      updateData.expiresAt = null;
+    }
+
+    await Announcement.findByIdAndUpdate(announcementId, updateData);
+
+    revalidatePath("/admin/announcements");
+    revalidatePath("/");
+    return { success: true, message: "Announcement updated" };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Failed to update announcement" };
+  }
+}
+
+// Delete announcement
+export async function deleteAnnouncement(announcementId: string) {
+  await connectDB();
+
+  try {
+    await Announcement.findByIdAndDelete(announcementId);
+
+    revalidatePath("/admin/announcements");
+    revalidatePath("/");
+    return { success: true, message: "Announcement deleted" };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Failed to delete announcement" };
+  }
+}
+
+// Get all announcements (for admin)
+export async function getAllAnnouncements() {
+  await connectDB();
+
+  try {
+    const announcements = await Announcement.find()
+      .sort({ isPinned: -1, priority: -1, createdAt: -1 })
+      .lean();
+
+    return {
+      success: true,
+      announcements: announcements.map((a) => ({
+        ...a,
+        _id: a._id.toString(),
+        createdAt: a.createdAt?.toISOString(),
+        updatedAt: a.updatedAt?.toISOString(),
+        expiresAt: a.expiresAt?.toISOString() || null,
+      })),
+    };
+  } catch (error) {
+    console.error(error);
+    return { success: false, announcements: [] };
+  }
+}
+
+// Get active announcements (for public display)
+export async function getActiveAnnouncements(
+  audience: "ALL" | "TEAMS" | "FREE_AGENTS" = "ALL",
+) {
+  await connectDB();
+
+  try {
+    const now = new Date();
+    const query: any = {
+      isActive: true,
+      $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }],
+      targetAudience: { $in: ["ALL", audience] },
+    };
+
+    const announcements = await Announcement.find(query)
+      .sort({ isPinned: -1, priority: -1, createdAt: -1 })
+      .lean();
+
+    return {
+      success: true,
+      announcements: announcements.map((a) => ({
+        ...a,
+        _id: a._id.toString(),
+        createdAt: a.createdAt?.toISOString(),
+      })),
+    };
+  } catch (error) {
+    console.error(error);
+    return { success: false, announcements: [] };
+  }
+}
+
+// Get banner announcement
+export async function getBannerAnnouncement() {
+  await connectDB();
+
+  try {
+    const now = new Date();
+    const banner = await Announcement.findOne({
+      isActive: true,
+      showOnBanner: true,
+      $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }],
+    })
+      .sort({ priority: -1, createdAt: -1 })
+      .lean();
+
+    if (!banner) {
+      return { success: true, banner: null };
+    }
+
+    return {
+      success: true,
+      banner: {
+        ...banner,
+        _id: banner._id.toString(),
+      },
+    };
+  } catch (error) {
+    console.error(error);
+    return { success: false, banner: null };
+  }
+}
+
+// ===================================================
+// ADMIN STATISTICS
+// ===================================================
+
+export async function getAdminStats() {
+  await connectDB();
+
+  try {
+    const [
+      totalUsers,
+      totalTeams,
+      activeTeams,
+      pendingRequests,
+      totalMatches,
+      completedMatches,
+      activeAnnouncements,
+    ] = await Promise.all([
+      User.countDocuments({ role: "USER" }),
+      Team.countDocuments(),
+      Team.countDocuments({ status: "ACTIVE" }),
+      JoinRequest.countDocuments({ status: "PENDING" }),
+      (await import("@/lib/models")).Match.countDocuments(),
+      (await import("@/lib/models")).Match.countDocuments({
+        status: "COMPLETED",
+      }),
+      Announcement.countDocuments({ isActive: true }),
+    ]);
+
+    const freeAgents = await User.countDocuments({
+      role: "USER",
+      teamId: null,
+    });
+
+    return {
+      success: true,
+      stats: {
+        totalUsers,
+        totalTeams,
+        activeTeams,
+        freeAgents,
+        pendingRequests,
+        totalMatches,
+        completedMatches,
+        activeAnnouncements,
+      },
+    };
+  } catch (error) {
+    console.error(error);
+    return { success: false, stats: null };
   }
 }
