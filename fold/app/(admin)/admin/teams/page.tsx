@@ -1,9 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import connectDB from "@/lib/mongodb";
-import Team from "@/lib/models/Team";
-import User from "@/lib/models/User";
-import JoinRequest from "@/lib/models/JoinRequest";
+import { User, Team, JoinRequest } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TeamManagementClient } from "./team-management-client";
