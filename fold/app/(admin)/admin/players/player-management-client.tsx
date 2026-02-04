@@ -40,7 +40,7 @@ import {
   forceRemoveUserFromTeam,
   forceCreatePlayer,
 } from "@/app/actions/admin-actions";
-import Papa from "papaparse";
+import type { ParseResult } from "papaparse";
 
 interface Player {
   _id: string;
@@ -116,29 +116,35 @@ export function PlayerManagementClient({
 
     setImporting(true);
 
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: async (results: any) => {
-        const playerData = results.data.map((row: any) => ({
-          email: row.email || row.Email,
-          name: row.name || row.Name,
-          rollNumber: row.rollNumber || row["Roll Number"] || row.roll,
-          ign: row.ign || row.IGN || row["In-Game Name"],
-        }));
+    try {
+      const Papa = (await import("papaparse")).default;
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: async (results: ParseResult<Record<string, string>>) => {
+          const playerData = results.data.map((row) => ({
+            email: row.email || row.Email,
+            name: row.name || row.Name,
+            rollNumber: row.rollNumber || row["Roll Number"] || row.roll,
+            ign: row.ign || row.IGN || row["In-Game Name"],
+          }));
 
-        const res = await importPlayers(playerData);
-        alert(res.message);
-        setImporting(false);
-        if (res.success) {
-          window.location.reload();
-        }
-      },
-      error: () => {
-        alert("Failed to parse CSV file");
-        setImporting(false);
-      },
-    });
+          const res = await importPlayers(playerData);
+          alert(res.message);
+          setImporting(false);
+          if (res.success) {
+            window.location.reload();
+          }
+        },
+        error: () => {
+          alert("Failed to parse CSV file");
+          setImporting(false);
+        },
+      });
+    } catch (error) {
+      alert("Failed to load CSV parser");
+      setImporting(false);
+    }
   };
 
   const handleDeletePlayer = async (playerId: string) => {
@@ -171,7 +177,8 @@ export function PlayerManagementClient({
     }
   };
 
-  const exportToCSV = () => {
+  const exportToCSV = async () => {
+    const Papa = (await import("papaparse")).default;
     const csv = Papa.unparse(
       players.map((p) => ({
         name: p.name,
@@ -263,6 +270,8 @@ export function PlayerManagementClient({
                   onChange={handleImport}
                   disabled={importing}
                   className="absolute inset-0 opacity-0 cursor-pointer"
+                  aria-label="Import CSV file"
+                  title="Select CSV file to import"
                 />
               </Button>
               <Button

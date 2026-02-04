@@ -1,5 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Sword, Trophy, Activity, Megaphone, UserPlus, Clock, Shield } from "lucide-react";
+import {
+  Users,
+  Sword,
+  Trophy,
+  Activity,
+  Megaphone,
+  UserPlus,
+  Clock,
+  Shield,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -55,7 +64,9 @@ export default async function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">{playerCount}</div>
-            <p className="text-xs text-zinc-500">{freeAgentCount} free agents</p>
+            <p className="text-xs text-zinc-500">
+              {freeAgentCount} free agents
+            </p>
           </CardContent>
         </Card>
 
@@ -67,7 +78,9 @@ export default async function AdminDashboard() {
             <Sword className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{activeTeamCount}</div>
+            <div className="text-2xl font-bold text-white">
+              {activeTeamCount}
+            </div>
             <p className="text-xs text-zinc-500">{teamCount} total clans</p>
           </CardContent>
         </Card>
@@ -81,7 +94,9 @@ export default async function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">{matchCount}</div>
-            <p className="text-xs text-zinc-500">{completedMatchCount} completed</p>
+            <p className="text-xs text-zinc-500">
+              {completedMatchCount} completed
+            </p>
           </CardContent>
         </Card>
 
@@ -93,7 +108,9 @@ export default async function AdminDashboard() {
             <Clock className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-500">{pendingRequestCount}</div>
+            <div className="text-2xl font-bold text-yellow-500">
+              {pendingRequestCount}
+            </div>
             <p className="text-xs text-zinc-500">needs attention</p>
           </CardContent>
         </Card>
