@@ -3,8 +3,24 @@
 import { revalidatePath } from "next/cache";
 import connectDB from "@/lib/mongodb";
 import { Match, Team } from "@/lib/models";
+import { getCurrentUser } from "@/lib/auth";
+
+// ============================================
+// ADMIN AUTH CHECK - All bracket actions MUST call this first
+// ============================================
+async function requireAdmin() {
+  const user = await getCurrentUser();
+  if (!user) {
+    throw new Error("Unauthorized: Not logged in");
+  }
+  if (user.role !== "ADMIN") {
+    throw new Error("Forbidden: Admin access required");
+  }
+  return user;
+}
 
 export async function createMatch(formData: FormData) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -34,6 +50,7 @@ export async function createMatch(formData: FormData) {
 }
 
 export async function updateMatch(matchId: string, formData: FormData) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -92,6 +109,7 @@ export async function updateMatch(matchId: string, formData: FormData) {
 }
 
 export async function deleteMatch(matchId: string) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -107,6 +125,7 @@ export async function deleteMatch(matchId: string) {
 }
 
 export async function generateBracket(formData: FormData) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -149,6 +168,7 @@ export async function generateBracket(formData: FormData) {
 
 // Helper to assign teams to first round matches
 export async function assignTeamsToFirstRound(teamIds: string[]) {
+  await requireAdmin();
   await connectDB();
 
   try {

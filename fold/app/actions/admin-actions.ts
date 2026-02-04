@@ -10,9 +10,25 @@ import {
   Announcement,
 } from "@/lib/models";
 import mongoose from "mongoose";
+import { getCurrentUser } from "@/lib/auth";
+
+// ============================================
+// ADMIN AUTH CHECK - All admin actions MUST call this first
+// ============================================
+async function requireAdmin() {
+  const user = await getCurrentUser();
+  if (!user) {
+    throw new Error("Unauthorized: Not logged in");
+  }
+  if (user.role !== "ADMIN") {
+    throw new Error("Forbidden: Admin access required");
+  }
+  return user;
+}
 
 // GOD MODE: Force add user to team (bypasses approval)
 export async function forceAddUserToTeam(userId: string, teamId: string) {
+  await requireAdmin(); // Security check
   await connectDB();
 
   try {
@@ -51,6 +67,7 @@ export async function forceAddUserToTeam(userId: string, teamId: string) {
 
 // GOD MODE: Force remove user from team
 export async function forceRemoveUserFromTeam(userId: string) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -101,6 +118,7 @@ export async function forceChangeTeamLeader(
   teamId: string,
   newLeaderId: string,
 ) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -135,6 +153,7 @@ export async function forceEditTeam(
   teamId: string,
   data: { name?: string; description?: string },
 ) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -151,6 +170,7 @@ export async function forceEditTeam(
 
 // GOD MODE: Delete team entirely
 export async function forceDeleteTeam(teamId: string) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -179,6 +199,7 @@ export async function forceDeleteTeam(teamId: string) {
 
 // GOD MODE: Force approve join request
 export async function forceApproveJoinRequest(requestId: string) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -219,6 +240,7 @@ export async function forceApproveJoinRequest(requestId: string) {
 export async function importPlayers(
   players: { email: string; name: string; rollNumber?: string }[],
 ) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -254,6 +276,7 @@ export async function importPlayers(
 
 // GOD MODE: Get all players with full details
 export async function getAllPlayers() {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -296,6 +319,7 @@ export async function forceEditPlayer(
     role?: "USER" | "ADMIN";
   },
 ) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -311,6 +335,7 @@ export async function forceEditPlayer(
 
 // GOD MODE: Delete player
 export async function forceDeletePlayer(userId: string) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -347,6 +372,7 @@ export async function forceCreatePlayer(data: {
   rollNumber?: string;
   ign?: string;
 }) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -380,6 +406,7 @@ export async function forceCreateTeam(data: {
   leaderId?: string; // Optional - if not provided, creates empty team
   maxMembers?: number;
 }) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -501,6 +528,7 @@ export async function updateSiteSettings(data: {
   heroSubtitle?: string;
   announcementBanner?: string;
 }) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -547,6 +575,7 @@ export async function createAnnouncement(data: {
   targetAudience?: "ALL" | "TEAMS" | "FREE_AGENTS" | "ADMINS";
   expiresAt?: string | null;
 }) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -585,6 +614,7 @@ export async function updateAnnouncement(
     expiresAt?: string | null;
   },
 ) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -609,6 +639,7 @@ export async function updateAnnouncement(
 
 // Delete announcement
 export async function deleteAnnouncement(announcementId: string) {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -625,6 +656,7 @@ export async function deleteAnnouncement(announcementId: string) {
 
 // Get all announcements (for admin)
 export async function getAllAnnouncements() {
+  await requireAdmin();
   await connectDB();
 
   try {
@@ -716,6 +748,7 @@ export async function getBannerAnnouncement() {
 // ===================================================
 
 export async function getAdminStats() {
+  await requireAdmin();
   await connectDB();
 
   try {
