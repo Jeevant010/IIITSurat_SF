@@ -7,8 +7,8 @@ import { PlayerManagementClient } from "./player-management-client";
 export default async function AdminPlayersPage() {
   await connectDB();
 
-  // Fetch all players with team info
-  const playersData = await User.find({ role: "USER" })
+  // Fetch ALL players (including admins) with team info
+  const playersData = await User.find()
     .populate("teamId", "name teamCode")
     .lean();
 
@@ -18,6 +18,9 @@ export default async function AdminPlayersPage() {
     name: p.name,
     rollNumber: p.rollNumber,
     ign: p.ign,
+    townHall: p.townHall,
+    phone: p.phone,
+    role: p.role,
     teamRole: p.teamRole,
     team: p.teamId
       ? {
@@ -38,9 +41,11 @@ export default async function AdminPlayersPage() {
   }));
 
   // Stats
-  const totalPlayers = players.length;
-  const playersInTeams = players.filter((p) => p.team).length;
-  const freeAgents = players.filter((p) => !p.team).length;
+  const totalPlayers = players.filter((p) => p.role === "USER").length;
+  const playersInTeams = players.filter(
+    (p) => p.team && p.role === "USER",
+  ).length;
+  const freeAgents = players.filter((p) => !p.team && p.role === "USER").length;
   const teamLeaders = players.filter((p) => p.teamRole === "LEADER").length;
 
   return (

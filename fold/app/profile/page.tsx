@@ -21,6 +21,7 @@ import {
   Users,
   Crown,
   Edit,
+  Castle,
 } from "lucide-react";
 import Link from "next/link";
 import connectDB from "@/lib/mongodb";
@@ -83,6 +84,16 @@ export default async function ProfilePage() {
                   <p className="text-xs text-zinc-500">In-Game Name</p>
                   <p className="text-white font-medium">
                     {user.ign || "Not set"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 bg-zinc-900/50 rounded-lg">
+                <Castle className="w-5 h-5 text-yellow-400" />
+                <div>
+                  <p className="text-xs text-zinc-500">Town Hall</p>
+                  <p className="text-white font-medium">
+                    {user.townHall ? `TH ${user.townHall}` : "Not set"}
                   </p>
                 </div>
               </div>
@@ -182,6 +193,24 @@ export default async function ProfilePage() {
                     defaultValue={user.ign || ""}
                     className="bg-zinc-900 border-zinc-700 text-white"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="townHall" className="text-zinc-300">
+                    Town Hall Level
+                  </Label>
+                  <select
+                    id="townHall"
+                    name="townHall"
+                    defaultValue={user.townHall || ""}
+                    className="w-full h-10 px-3 bg-zinc-900 border border-zinc-700 text-white rounded-md"
+                  >
+                    <option value="">Select TH</option>
+                    {[...Array(18)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        TH {i + 1}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="rollNumber" className="text-zinc-300">

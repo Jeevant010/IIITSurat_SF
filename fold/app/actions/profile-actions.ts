@@ -17,6 +17,8 @@ export async function completeProfile(formData: FormData) {
   const rollNumber = formData.get("rollNumber") as string;
   const phone = formData.get("phone") as string;
   const name = formData.get("name") as string;
+  const townHallStr = formData.get("townHall") as string;
+  const townHall = townHallStr ? parseInt(townHallStr) : null;
 
   // Validation
   if (!ign || ign.trim().length < 2) {
@@ -26,12 +28,20 @@ export async function completeProfile(formData: FormData) {
     };
   }
 
+  if (townHall !== null && (townHall < 1 || townHall > 18)) {
+    return {
+      success: false,
+      message: "Town Hall must be between 1 and 18",
+    };
+  }
+
   try {
     await User.findByIdAndUpdate(currentUser._id, {
       ign: ign.trim(),
       rollNumber: rollNumber?.trim() || null,
       phone: phone?.trim() || null,
       name: name?.trim() || currentUser.name,
+      townHall: townHall,
       isProfileComplete: true,
     });
 
@@ -56,6 +66,8 @@ export async function updateProfile(formData: FormData) {
   const rollNumber = formData.get("rollNumber") as string;
   const phone = formData.get("phone") as string;
   const name = formData.get("name") as string;
+  const townHallStr = formData.get("townHall") as string;
+  const townHall = townHallStr ? parseInt(townHallStr) : null;
 
   try {
     await User.findByIdAndUpdate(currentUser._id, {
@@ -65,6 +77,7 @@ export async function updateProfile(formData: FormData) {
       }),
       ...(phone !== undefined && { phone: phone.trim() || null }),
       ...(name && { name: name.trim() }),
+      ...(townHall !== null && { townHall }),
     });
 
     revalidatePath("/profile");

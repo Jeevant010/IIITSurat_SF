@@ -12,12 +12,13 @@ export default async function AdminBracketsPage() {
     .populate("team1Id", "name teamCode")
     .populate("team2Id", "name teamCode")
     .populate("winnerId", "name")
-    .sort({ round: 1, matchNumber: 1 })
+    .sort({ stage: 1, round: 1, matchNumber: 1 })
     .lean();
 
   const matches = matchesData.map((m: any) => ({
     _id: m._id.toString(),
     tournamentName: m.tournamentName,
+    stage: m.stage || "KNOCKOUT",
     round: m.round,
     matchNumber: m.matchNumber,
     team1: m.team1Id
@@ -36,6 +37,8 @@ export default async function AdminBracketsPage() {
       : null,
     team1Score: m.team1Score || 0,
     team2Score: m.team2Score || 0,
+    team1Stars: m.team1Stars || 0,
+    team2Stars: m.team2Stars || 0,
     winnerId: m.winnerId?._id.toString() || null,
     status: m.status,
     scheduledAt: m.scheduledAt?.toISOString() || null,
@@ -57,8 +60,8 @@ export default async function AdminBracketsPage() {
           Tournament Bracket Manager
         </h1>
         <p className="text-zinc-400 mt-2">
-          Create and manage tournament brackets. Assign teams, update scores,
-          and track progress.
+          Create and manage tournament brackets. Supports IPL-style format with
+          groups, eliminators, and qualifiers.
         </p>
       </div>
 

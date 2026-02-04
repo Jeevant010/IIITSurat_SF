@@ -316,7 +316,10 @@ export async function forceEditPlayer(
     email?: string;
     rollNumber?: string;
     ign?: string;
+    townHall?: number | null;
+    phone?: string;
     role?: "USER" | "ADMIN";
+    isProfileComplete?: boolean;
   },
 ) {
   await requireAdmin();
@@ -371,6 +374,8 @@ export async function forceCreatePlayer(data: {
   name: string;
   rollNumber?: string;
   ign?: string;
+  townHall?: number;
+  phone?: string;
 }) {
   await requireAdmin();
   await connectDB();
@@ -384,6 +389,7 @@ export async function forceCreatePlayer(data: {
     await User.create({
       ...data,
       role: "USER",
+      isProfileComplete: !!(data.ign && data.townHall),
     });
 
     revalidatePath("/admin/players");

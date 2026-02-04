@@ -19,6 +19,7 @@ interface Player {
   _id: string;
   name: string;
   ign?: string | null;
+  townHall?: number | null;
   teamRole?: "LEADER" | "MEMBER" | null;
   team?: {
     _id: string;
@@ -183,6 +184,7 @@ export function PublicPlayersClient({ players, stats }: Props) {
                 <TableRow className="border-zinc-800">
                   <TableHead className="text-zinc-400">Player Name</TableHead>
                   <TableHead className="text-zinc-400">IGN</TableHead>
+                  <TableHead className="text-zinc-400">TH Level</TableHead>
                   <TableHead className="text-zinc-400">Team</TableHead>
                   <TableHead className="text-zinc-400">Role</TableHead>
                 </TableRow>
@@ -201,6 +203,15 @@ export function PublicPlayersClient({ players, stats }: Props) {
                     </TableCell>
                     <TableCell className="text-zinc-400">
                       {player.ign || <span className="text-zinc-600">N/A</span>}
+                    </TableCell>
+                    <TableCell>
+                      {player.townHall ? (
+                        <Badge className="bg-yellow-600 text-black font-bold">
+                          TH {player.townHall}
+                        </Badge>
+                      ) : (
+                        <span className="text-zinc-600">-</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       {player.team ? (

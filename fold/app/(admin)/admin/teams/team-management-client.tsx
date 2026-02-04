@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -108,30 +109,74 @@ export function TeamManagementClient({
   const [creating, setCreating] = useState(false);
 
   const handleAddUser = async (userId: string, teamId: string) => {
+    toast.loading("Adding user to team...", { id: "add-user" });
     const result = await forceAddUserToTeam(userId, teamId);
-    alert(result.message);
+    if (result.success) {
+      toast.success("User Added! 👥", {
+        id: "add-user",
+        description: result.message,
+      });
+    } else {
+      toast.error("Failed to add user", {
+        id: "add-user",
+        description: result.message,
+      });
+    }
     window.location.reload();
   };
 
   const handleRemoveUser = async (userId: string) => {
     if (!confirm("Are you sure you want to remove this user from their team?"))
       return;
+    toast.loading("Removing user from team...", { id: "remove-user" });
     const result = await forceRemoveUserFromTeam(userId);
-    alert(result.message);
+    if (result.success) {
+      toast.success("User Removed", {
+        id: "remove-user",
+        description: result.message,
+      });
+    } else {
+      toast.error("Failed to remove user", {
+        id: "remove-user",
+        description: result.message,
+      });
+    }
     window.location.reload();
   };
 
   const handleChangeLeader = async (teamId: string, newLeaderId: string) => {
     if (!confirm("Are you sure you want to change the team leader?")) return;
+    toast.loading("Changing team leader...", { id: "change-leader" });
     const result = await forceChangeTeamLeader(teamId, newLeaderId);
-    alert(result.message);
+    if (result.success) {
+      toast.success("Leader Changed! 👑", {
+        id: "change-leader",
+        description: result.message,
+      });
+    } else {
+      toast.error("Failed to change leader", {
+        id: "change-leader",
+        description: result.message,
+      });
+    }
     window.location.reload();
   };
 
   const handleEditTeam = async (teamId: string) => {
     if (!editingTeam) return;
+    toast.loading("Updating team...", { id: "edit-team" });
     const result = await forceEditTeam(teamId, editingTeam);
-    alert(result.message);
+    if (result.success) {
+      toast.success("Team Updated! ✅", {
+        id: "edit-team",
+        description: result.message,
+      });
+    } else {
+      toast.error("Failed to update team", {
+        id: "edit-team",
+        description: result.message,
+      });
+    }
     setEditingTeam(null);
     window.location.reload();
   };
@@ -139,29 +184,57 @@ export function TeamManagementClient({
   const handleDeleteTeam = async (teamId: string, teamName: string) => {
     if (!confirm(`DANGER: Delete team "${teamName}" and remove all members?`))
       return;
+    toast.loading("Deleting team...", { id: "delete-team" });
     const result = await forceDeleteTeam(teamId);
-    alert(result.message);
+    if (result.success) {
+      toast.success("Team Deleted", {
+        id: "delete-team",
+        description: result.message,
+      });
+    } else {
+      toast.error("Failed to delete team", {
+        id: "delete-team",
+        description: result.message,
+      });
+    }
     window.location.reload();
   };
 
   const handleApproveRequest = async (requestId: string) => {
+    toast.loading("Approving request...", { id: "approve-request" });
     const result = await forceApproveJoinRequest(requestId);
-    alert(result.message);
+    if (result.success) {
+      toast.success("Request Approved! ✅", {
+        id: "approve-request",
+        description: result.message,
+      });
+    } else {
+      toast.error("Failed to approve request", {
+        id: "approve-request",
+        description: result.message,
+      });
+    }
     window.location.reload();
   };
 
   const handleCreateTeam = async () => {
     if (!newTeam.name || !newTeam.teamCode) {
-      alert("Team name and code are required");
+      toast.error("Missing required fields", {
+        description: "Team name and code are required",
+      });
       return;
     }
 
     setCreating(true);
+    toast.loading("Creating clan...", { id: "create-team" });
     const result = await forceCreateTeam(newTeam);
     setCreating(false);
 
     if (result.success) {
-      alert("✅ " + result.message);
+      toast.success("Clan Created! ⚔️", {
+        id: "create-team",
+        description: result.message,
+      });
       setCreateDialogOpen(false);
       setNewTeam({
         name: "",
@@ -172,7 +245,10 @@ export function TeamManagementClient({
       });
       window.location.reload();
     } else {
-      alert("❌ " + result.message);
+      toast.error("Failed to create clan", {
+        id: "create-team",
+        description: result.message,
+      });
     }
   };
 

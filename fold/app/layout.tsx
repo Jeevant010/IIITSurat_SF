@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { SessionProvider } from "@/components/session-provider";
 import { Navbar } from "@/components/navbar";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default function RootLayout({
           <main className="relative flex min-h-screen flex-col">
             {children}
           </main>
+          <Toaster />
         </SessionProvider>
       </body>
     </html>

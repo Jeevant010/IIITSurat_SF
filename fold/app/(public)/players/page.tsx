@@ -16,6 +16,7 @@ export default async function PublicPlayersPage() {
     _id: p._id.toString(),
     name: p.name,
     ign: p.ign,
+    townHall: p.townHall,
     teamRole: p.teamRole,
     team: p.teamId
       ? {
@@ -31,11 +32,11 @@ export default async function PublicPlayersPage() {
   const freeAgents = players.filter((p) => !p.team).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-purple-950">
+    <div className="min-h-screen bg-gradient-to-b from-black via-yellow-950/10 to-black">
       <div className="container mx-auto px-4 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 mb-4">
-            IIIT Surat Spring Fiesta 2026
+          <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 mb-4">
+            Clash of Clans - Spring Fiesta 2026
           </h1>
           <p className="text-xl text-zinc-300">All Registered Players</p>
         </div>

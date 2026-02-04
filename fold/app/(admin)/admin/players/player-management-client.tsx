@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -41,6 +42,13 @@ import {
   forceCreatePlayer,
 } from "@/app/actions/admin-actions";
 import type { ParseResult } from "papaparse";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Player {
   _id: string;
@@ -48,6 +56,9 @@ interface Player {
   name: string;
   rollNumber?: string | null;
   ign?: string | null;
+  townHall?: number | null;
+  phone?: string | null;
+  role?: "USER" | "ADMIN";
   teamRole?: "LEADER" | "MEMBER" | null;
   team?: {
     _id: string;
@@ -92,6 +103,17 @@ export function PlayerManagementClient({
     name: "",
     rollNumber: "",
     ign: "",
+    townHall: "",
+    phone: "",
+  });
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    email: "",
+    rollNumber: "",
+    ign: "",
+    townHall: "",
+    phone: "",
+    role: "USER" as "USER" | "ADMIN",
   });
 
   // Filter players
@@ -115,6 +137,7 @@ export function PlayerManagementClient({
     if (!file) return;
 
     setImporting(true);
+    toast.loading("Importing players...", { id: "import-players" });
 
     try {
       const Papa = (await import("papaparse")).default;
@@ -130,19 +153,27 @@ export function PlayerManagementClient({
           }));
 
           const res = await importPlayers(playerData);
-          alert(res.message);
           setImporting(false);
           if (res.success) {
+            toast.success("Import Successful! 📥", {
+              id: "import-players",
+              description: res.message,
+            });
             window.location.reload();
+          } else {
+            toast.error("Import Failed", {
+              id: "import-players",
+              description: res.message,
+            });
           }
         },
         error: () => {
-          alert("Failed to parse CSV file");
+          toast.error("Failed to parse CSV file", { id: "import-players" });
           setImporting(false);
         },
       });
     } catch (error) {
-      alert("Failed to load CSV parser");
+      toast.error("Failed to load CSV parser", { id: "import-players" });
       setImporting(false);
     }
   };
@@ -150,34 +181,109 @@ export function PlayerManagementClient({
   const handleDeletePlayer = async (playerId: string) => {
     if (!confirm("Are you sure you want to delete this player?")) return;
 
+    toast.loading("Deleting player...", { id: "delete-player" });
     const res = await forceDeletePlayer(playerId);
-    alert(res.message);
     if (res.success) {
+      toast.success("Player Deleted", {
+        id: "delete-player",
+        description: res.message,
+      });
       setPlayers(players.filter((p) => p._id !== playerId));
+    } else {
+      toast.error("Failed to delete player", {
+        id: "delete-player",
+        description: res.message,
+      });
     }
   };
 
   const handleRemoveFromTeam = async (playerId: string) => {
     if (!confirm("Remove this player from their team?")) return;
 
+    toast.loading("Removing from team...", { id: "remove-team" });
     const res = await forceRemoveUserFromTeam(playerId);
-    alert(res.message);
     if (res.success) {
+      toast.success("Removed from Team", {
+        id: "remove-team",
+        description: res.message,
+      });
       window.location.reload();
+    } else {
+      toast.error("Failed to remove from team", {
+        id: "remove-team",
+        description: res.message,
+      });
     }
   };
 
   const handleCreatePlayer = async () => {
-    const res = await forceCreatePlayer(createFormData);
-    alert(res.message);
+    toast.loading("Creating player...", { id: "create-player" });
+    const res = await forceCreatePlayer({
+      ...createFormData,
+      townHall: createFormData.townHall
+        ? parseInt(createFormData.townHall)
+        : undefined,
+    });
     if (res.success) {
+      toast.success("Player Created! 👤", {
+        id: "create-player",
+        description: res.message,
+      });
       setShowCreateForm(false);
-      setCreateFormData({ email: "", name: "", rollNumber: "", ign: "" });
+      setCreateFormData({
+        email: "",
+        name: "",
+        rollNumber: "",
+        ign: "",
+        townHall: "",
+        phone: "",
+      });
       window.location.reload();
+    } else {
+      toast.error("Failed to create player", {
+        id: "create-player",
+        description: res.message,
+      });
+    }
+  };
+
+  const openEditDialog = (player: Player) => {
+    setEditingPlayer(player);
+    setEditFormData({
+      name: player.name || "",
+      email: player.email || "",
+      rollNumber: player.rollNumber || "",
+      ign: player.ign || "",
+      townHall: player.townHall?.toString() || "",
+      phone: player.phone || "",
+      role: player.role || "USER",
+    });
+  };
+
+  const handleEditPlayer = async () => {
+    if (!editingPlayer) return;
+    toast.loading("Updating player...", { id: "edit-player" });
+    const res = await forceEditPlayer(editingPlayer._id, {
+      ...editFormData,
+      townHall: editFormData.townHall ? parseInt(editFormData.townHall) : null,
+    });
+    if (res.success) {
+      toast.success("Player Updated! ✅", {
+        id: "edit-player",
+        description: res.message,
+      });
+      setEditingPlayer(null);
+      window.location.reload();
+    } else {
+      toast.error("Failed to update player", {
+        id: "edit-player",
+        description: res.message,
+      });
     }
   };
 
   const exportToCSV = async () => {
+    toast.info("Preparing export...", { id: "export" });
     const Papa = (await import("papaparse")).default;
     const csv = Papa.unparse(
       players.map((p) => ({
@@ -197,6 +303,10 @@ export function PlayerManagementClient({
     a.href = url;
     a.download = `sf2026-players-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
+    toast.success("Export Complete! 📁", {
+      id: "export",
+      description: "Player data downloaded to CSV.",
+    });
   };
 
   return (
@@ -382,6 +492,39 @@ export function PlayerManagementClient({
                   className="bg-black border-zinc-700 text-white"
                 />
               </div>
+              <div>
+                <Label className="text-zinc-300">Town Hall Level</Label>
+                <select
+                  value={createFormData.townHall}
+                  onChange={(e) =>
+                    setCreateFormData({
+                      ...createFormData,
+                      townHall: e.target.value,
+                    })
+                  }
+                  className="w-full h-10 px-3 bg-black border border-zinc-700 text-white rounded-md"
+                >
+                  <option value="">Select TH</option>
+                  {[...Array(17)].map((_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      TH {i + 1}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <Label className="text-zinc-300">Phone</Label>
+                <Input
+                  value={createFormData.phone}
+                  onChange={(e) =>
+                    setCreateFormData({
+                      ...createFormData,
+                      phone: e.target.value,
+                    })
+                  }
+                  className="bg-black border-zinc-700 text-white"
+                />
+              </div>
             </div>
             <div className="flex gap-2">
               <Button
@@ -419,6 +562,7 @@ export function PlayerManagementClient({
                   <TableHead className="text-zinc-400">Email</TableHead>
                   <TableHead className="text-zinc-400">Roll No</TableHead>
                   <TableHead className="text-zinc-400">IGN</TableHead>
+                  <TableHead className="text-zinc-400">TH</TableHead>
                   <TableHead className="text-zinc-400">Team</TableHead>
                   <TableHead className="text-zinc-400">Role</TableHead>
                   <TableHead className="text-zinc-400">Actions</TableHead>
@@ -438,6 +582,9 @@ export function PlayerManagementClient({
                     </TableCell>
                     <TableCell className="text-zinc-400">
                       {player.ign || "-"}
+                    </TableCell>
+                    <TableCell className="text-yellow-500 font-medium">
+                      {player.townHall ? `TH${player.townHall}` : "-"}
                     </TableCell>
                     <TableCell>
                       {player.team ? (
@@ -471,6 +618,14 @@ export function PlayerManagementClient({
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => openEditDialog(player)}
+                          className="border-zinc-700"
+                        >
+                          <Edit className="w-3 h-3" />
+                        </Button>
                         {player.team && (
                           <Button
                             size="sm"
@@ -498,6 +653,129 @@ export function PlayerManagementClient({
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit Player Dialog */}
+      <Dialog
+        open={!!editingPlayer}
+        onOpenChange={() => setEditingPlayer(null)}
+      >
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Player</DialogTitle>
+            <DialogDescription className="text-zinc-400">
+              Update player details. All fields are editable.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="grid gap-4 grid-cols-2">
+              <div>
+                <Label className="text-zinc-300">Name</Label>
+                <Input
+                  value={editFormData.name}
+                  onChange={(e) =>
+                    setEditFormData({ ...editFormData, name: e.target.value })
+                  }
+                  className="bg-black border-zinc-700 text-white"
+                />
+              </div>
+              <div>
+                <Label className="text-zinc-300">Email</Label>
+                <Input
+                  value={editFormData.email}
+                  onChange={(e) =>
+                    setEditFormData({ ...editFormData, email: e.target.value })
+                  }
+                  className="bg-black border-zinc-700 text-white"
+                />
+              </div>
+              <div>
+                <Label className="text-zinc-300">In-Game Name</Label>
+                <Input
+                  value={editFormData.ign}
+                  onChange={(e) =>
+                    setEditFormData({ ...editFormData, ign: e.target.value })
+                  }
+                  className="bg-black border-zinc-700 text-white"
+                />
+              </div>
+              <div>
+                <Label className="text-zinc-300">Town Hall</Label>
+                <select
+                  value={editFormData.townHall}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      townHall: e.target.value,
+                    })
+                  }
+                  className="w-full h-10 px-3 bg-black border border-zinc-700 text-white rounded-md"
+                >
+                  <option value="">None</option>
+                  {[...Array(17)].map((_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      TH {i + 1}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <Label className="text-zinc-300">Roll Number</Label>
+                <Input
+                  value={editFormData.rollNumber}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      rollNumber: e.target.value,
+                    })
+                  }
+                  className="bg-black border-zinc-700 text-white"
+                />
+              </div>
+              <div>
+                <Label className="text-zinc-300">Phone</Label>
+                <Input
+                  value={editFormData.phone}
+                  onChange={(e) =>
+                    setEditFormData({ ...editFormData, phone: e.target.value })
+                  }
+                  className="bg-black border-zinc-700 text-white"
+                />
+              </div>
+              <div className="col-span-2">
+                <Label className="text-zinc-300">User Role</Label>
+                <select
+                  value={editFormData.role}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      role: e.target.value as "USER" | "ADMIN",
+                    })
+                  }
+                  className="w-full h-10 px-3 bg-black border border-zinc-700 text-white rounded-md"
+                >
+                  <option value="USER">User</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button
+                onClick={handleEditPlayer}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                Save Changes
+              </Button>
+              <Button
+                onClick={() => setEditingPlayer(null)}
+                variant="outline"
+                className="border-zinc-700"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

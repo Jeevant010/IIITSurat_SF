@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +21,7 @@ import {
   Phone,
   ArrowRight,
   Sparkles,
+  Castle,
 } from "lucide-react";
 import { completeProfile } from "@/app/actions/profile-actions";
 import { AuthUser } from "@/lib/auth";
@@ -36,13 +38,22 @@ export function CompleteProfileForm({ user }: Props) {
   async function handleSubmit(formData: FormData) {
     setLoading(true);
     setError("");
+    toast.loading("Saving your profile...", { id: "profile-save" });
 
     const result = await completeProfile(formData);
 
     if (result.success) {
+      toast.success("Profile Complete! 🎮", {
+        id: "profile-save",
+        description: "Welcome to Spring Fiesta 2026! Let's find you a team.",
+      });
       router.push("/teams");
     } else {
       setError(result.message);
+      toast.error("Failed to save profile", {
+        id: "profile-save",
+        description: result.message,
+      });
       setLoading(false);
     }
   }
@@ -139,6 +150,33 @@ export function CompleteProfileForm({ user }: Props) {
                 placeholder="e.g., 2023001"
                 className="bg-zinc-900 border-zinc-700 text-white focus:border-purple-500"
               />
+            </div>
+
+            {/* Town Hall Level */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="townHall"
+                className="text-zinc-300 flex items-center gap-2"
+              >
+                <Castle className="w-4 h-4" />
+                Town Hall Level *
+              </Label>
+              <select
+                id="townHall"
+                name="townHall"
+                required
+                className="w-full h-10 px-3 bg-zinc-900 border border-zinc-700 text-white rounded-md focus:border-purple-500 focus:outline-none"
+              >
+                <option value="">Select your TH level</option>
+                {[...Array(18)].map((_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    TH {i + 1}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-zinc-500">
+                Your current Town Hall level in Clash of Clans
+              </p>
             </div>
 
             {/* Phone */}
