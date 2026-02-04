@@ -442,14 +442,10 @@ export default function AnnouncementsClient({
                   <div className="flex items-center gap-4 mt-4 text-xs text-zinc-500">
                     <span>Priority: {announcement.priority}</span>
                     {announcement.expiresAt && (
-                      <span>
-                        Expires: {formatDate(announcement.expiresAt)}
-                      </span>
+                      <span>Expires: {formatDate(announcement.expiresAt)}</span>
                     )}
                     {announcement.createdAt && (
-                      <span>
-                        Created: {formatDate(announcement.createdAt)}
-                      </span>
+                      <span>Created: {formatDate(announcement.createdAt)}</span>
                     )}
                   </div>
                 </CardContent>
