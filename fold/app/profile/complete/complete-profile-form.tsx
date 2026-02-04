@@ -54,7 +54,8 @@ const AVATAR_OPTIONS = [
 
 function getAvatarUrl(avatarId: number): string {
   const avatar = AVATAR_OPTIONS.find((a) => a.id === avatarId);
-  if (!avatar) return `https://api.dicebear.com/7.x/adventurer/svg?seed=default`;
+  if (!avatar)
+    return `https://api.dicebear.com/7.x/adventurer/svg?seed=default`;
   return `https://api.dicebear.com/7.x/${avatar.style}/svg?seed=${avatar.seed}`;
 }
 
@@ -66,7 +67,9 @@ export function CompleteProfileForm({ user }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState<number>(user.avatarId || 1);
+  const [selectedAvatar, setSelectedAvatar] = useState<number>(
+    user.avatarId || 1,
+  );
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
@@ -127,7 +130,7 @@ export function CompleteProfileForm({ user }: Props) {
           <CardDescription className="text-zinc-400">
             {user.email}
           </CardDescription>
-          
+
           {/* Avatar Grid */}
           <div className="mt-4">
             <p className="text-xs text-zinc-500 mb-2">Choose your avatar:</p>
@@ -163,7 +166,7 @@ export function CompleteProfileForm({ user }: Props) {
           <form action={handleSubmit} className="space-y-5">
             {/* Hidden avatar field */}
             <input type="hidden" name="avatarId" value={selectedAvatar} />
-            
+
             {/* Display Name */}
             <div className="space-y-2">
               <Label

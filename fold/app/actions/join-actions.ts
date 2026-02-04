@@ -29,7 +29,11 @@ export async function requestToJoinTeam(
 
     // Check if user is already in a team
     if (user.teamId) {
-      return { success: false, message: "You are already in a team!" };
+      return {
+        success: false,
+        message:
+          "You are already in another clan! Leave your current clan first.",
+      };
     }
 
     // Check if team exists

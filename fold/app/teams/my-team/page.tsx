@@ -27,7 +27,11 @@ import {
   approveJoinRequest,
   rejectJoinRequest,
 } from "@/app/actions/join-actions";
-import { leaveTeam, kickMember, transferLeadership } from "@/app/actions/team-actions";
+import {
+  leaveTeam,
+  kickMember,
+  transferLeadership,
+} from "@/app/actions/team-actions";
 import { getCurrentUser } from "@/lib/auth";
 import { CopyCodeButton } from "./copy-code-button";
 
@@ -256,7 +260,8 @@ export default async function MyTeamPage() {
                               size="sm"
                               className="text-yellow-500 hover:bg-yellow-950 hover:text-yellow-400"
                             >
-                              <ArrowRightLeft className="h-4 w-4 mr-1" /> Make Leader
+                              <ArrowRightLeft className="h-4 w-4 mr-1" /> Make
+                              Leader
                             </Button>
                           </form>
                           <form

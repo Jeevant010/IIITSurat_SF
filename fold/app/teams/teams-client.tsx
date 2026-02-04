@@ -93,8 +93,8 @@ export function TeamsClient({
     }
 
     if (userTeamId) {
-      toast.warning("Already in a Team", {
-        description: "You need to leave your current team first!",
+      toast.warning("Already in Another Clan", {
+        description: "You need to leave your current clan first!",
       });
       return;
     }

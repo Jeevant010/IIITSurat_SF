@@ -8,24 +8,25 @@ import { getCurrentUser } from "@/lib/auth";
 import mongoose from "mongoose";
 
 // Helper function to check if team has war history
-async function teamHasWarHistory(teamId: mongoose.Types.ObjectId): Promise<boolean> {
+async function teamHasWarHistory(
+  teamId: mongoose.Types.ObjectId,
+): Promise<boolean> {
   const matchCount = await Match.countDocuments({
-    $or: [
-      { team1Id: teamId },
-      { team2Id: teamId },
-    ],
+    $or: [{ team1Id: teamId }, { team2Id: teamId }],
   });
   return matchCount > 0;
 }
 
 // Helper function to delete team if no members and no war history
-async function deleteTeamIfEmpty(teamId: mongoose.Types.ObjectId): Promise<void> {
+async function deleteTeamIfEmpty(
+  teamId: mongoose.Types.ObjectId,
+): Promise<void> {
   const memberCount = await User.countDocuments({ teamId: teamId });
-  
+
   if (memberCount === 0) {
     // Check if team has played any matches
     const hasWarHistory = await teamHasWarHistory(teamId);
-    
+
     if (!hasWarHistory) {
       // No members and no war history - delete the team
       await Team.findByIdAndDelete(teamId);
@@ -70,7 +71,7 @@ export async function createTeam(formData: FormData): Promise<void> {
     // Check if user is already in a team
     if (user.teamId) {
       throw new Error(
-        "You are already in a team! Leave your current team first.",
+        "You are already in another clan! Leave your current clan first.",
       );
     }
 

@@ -14,12 +14,11 @@ import mongoose from "mongoose";
 import { getCurrentUser } from "@/lib/auth";
 
 // Helper function to check if team has war history
-async function teamHasWarHistory(teamId: mongoose.Types.ObjectId): Promise<boolean> {
+async function teamHasWarHistory(
+  teamId: mongoose.Types.ObjectId,
+): Promise<boolean> {
   const matchCount = await Match.countDocuments({
-    $or: [
-      { team1Id: teamId },
-      { team2Id: teamId },
-    ],
+    $or: [{ team1Id: teamId }, { team2Id: teamId }],
   });
   return matchCount > 0;
 }
@@ -467,7 +466,7 @@ export async function forceCreateTeam(data: {
       if (leader.teamId) {
         return {
           success: false,
-          message: "Selected user is already in a team",
+          message: "Selected user is already in another clan",
         };
       }
       leaderId = new mongoose.Types.ObjectId(data.leaderId);
