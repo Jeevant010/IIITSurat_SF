@@ -24,46 +24,6 @@ import LoadingScreen from "@/components/loading-screen";
 function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-black via-purple-950 to-black text-foreground">
-      {/* TOP NAVIGATION */}
-      <header className="sticky top-0 z-40 w-full border-b border-purple-500/20 bg-black/80 backdrop-blur-xl">
-        <div className="container flex h-16 items-center justify-between px-4 md:px-8">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-purple-500 to-pink-500 p-2 rounded-lg">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
-              IIIT Surat SF
-            </span>
-          </div>
-          <nav className="flex gap-4 sm:gap-6">
-            <Link
-              className="text-sm font-medium text-zinc-300 hover:text-purple-400 transition-colors"
-              href="/leaderboard"
-            >
-              Leaderboard
-            </Link>
-            <Link
-              className="text-sm font-medium text-zinc-300 hover:text-purple-400 transition-colors"
-              href="/teams"
-            >
-              Teams
-            </Link>
-            <Link
-              className="text-sm font-medium text-zinc-300 hover:text-purple-400 transition-colors"
-              href="/players"
-            >
-              Players
-            </Link>
-            <Link
-              className="text-sm font-medium text-purple-400 hover:text-purple-300"
-              href="/admin/dashboard"
-            >
-              Admin
-            </Link>
-          </nav>
-        </div>
-      </header>
-
       <main className="flex-1">
         {/* HERO SECTION */}
         <section className="w-full py-12 md:py-24 lg:py-32 flex flex-col items-center text-center px-4 relative overflow-hidden">
