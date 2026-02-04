@@ -55,19 +55,24 @@ async function connectDB(retries = 3): Promise<typeof mongoose> {
       return cached.conn;
     } catch (e) {
       attempt++;
-      console.error(`❌ MongoDB connection attempt ${attempt}/${retries} failed:`, e);
-      
+      console.error(
+        `❌ MongoDB connection attempt ${attempt}/${retries} failed:`,
+        e,
+      );
+
       if (attempt >= retries) {
         cached.promise = null;
         cached.conn = null;
         throw new Error(
-          `MongoDB connection failed after ${retries} attempts. Please check your MONGODB_URI and network connection.`
+          `MongoDB connection failed after ${retries} attempts. Please check your MONGODB_URI and network connection.`,
         );
       }
-      
+
       // Wait before retrying (exponential backoff)
-      await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
-      
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.pow(2, attempt) * 1000),
+      );
+
       // Reset the promise for retry
       cached.promise = mongoose.connect(MONGODB_URI, {
         bufferCommands: false,
@@ -86,11 +91,11 @@ async function connectDB(retries = 3): Promise<typeof mongoose> {
 }
 
 // Graceful shutdown handler
-if (typeof process !== 'undefined') {
-  process.on('SIGINT', async () => {
+if (typeof process !== "undefined") {
+  process.on("SIGINT", async () => {
     if (cached.conn) {
       await mongoose.connection.close();
-      console.log('MongoDB connection closed through app termination');
+      console.log("MongoDB connection closed through app termination");
     }
     process.exit(0);
   });
