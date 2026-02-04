@@ -13,15 +13,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Copy, Crown, UserMinus, CheckCircle, XCircle } from "lucide-react";
+import {
+  Copy,
+  Crown,
+  UserMinus,
+  CheckCircle,
+  XCircle,
+  LogOut,
+} from "lucide-react";
 import connectDB from "@/lib/mongodb";
-import User from "@/lib/models/User";
-import Team from "@/lib/models/Team";
-import JoinRequest from "@/lib/models/JoinRequest";
+import { User, Team, JoinRequest } from "@/lib/models";
 import {
   approveJoinRequest,
   rejectJoinRequest,
 } from "@/app/actions/join-actions";
+import { leaveTeam, kickMember } from "@/app/actions/team-actions";
+import { getCurrentUser } from "@/lib/auth";
 
 // Helper to get initials for Avatars
 function getInitials(name: string) {
@@ -36,13 +43,16 @@ function getInitials(name: string) {
 export default async function MyTeamPage() {
   await connectDB();
 
-  // 1. MOCK AUTH (Replace with Clerk auth().userId later)
-  const currentUserId = "user_123_test";
+  // Get authenticated user
+  const currentUser = await getCurrentUser();
+  if (!currentUser) {
+    redirect("/teams");
+  }
 
-  // 2. Fetch User & Their Team Data
-  const user = await User.findOne({ _id: currentUserId }).lean();
+  // Fetch user with fresh data from DB
+  const user = await User.findById(currentUser._id).lean();
 
-  // 3. Safety Check: If user has no team, send them to create/join
+  // Safety Check: If user has no team, send them to create/join
   if (!user || !user.teamId) {
     redirect("/teams");
   }
@@ -62,7 +72,7 @@ export default async function MyTeamPage() {
     redirect("/teams");
   }
 
-  const isLeader = team.leaderId.toString() === currentUserId;
+  const isLeader = team.leaderId.toString() === user._id.toString();
 
   return (
     <div className="container mx-auto p-6 max-w-5xl space-y-8">
@@ -236,20 +246,95 @@ export default async function MyTeamPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     {/* Only Leader can kick people (but not themselves) */}
-                    {isLeader && member._id.toString() !== currentUserId && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-500 hover:bg-red-950 hover:text-red-400"
-                      >
-                        <UserMinus className="h-4 w-4 mr-1" /> Kick
-                      </Button>
-                    )}
+                    {isLeader &&
+                      member._id.toString() !== user._id.toString() && (
+                        <form
+                          action={async () => {
+                            "use server";
+                            await kickMember(member._id.toString());
+                          }}
+                        >
+                          <Button
+                            type="submit"
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-500 hover:bg-red-950 hover:text-red-400"
+                          >
+                            <UserMinus className="h-4 w-4 mr-1" /> Kick
+                          </Button>
+                        </form>
+                      )}
+                    {/* Members (non-leaders) can leave */}
+                    {!isLeader &&
+                      member._id.toString() === user._id.toString() && (
+                        <form
+                          action={async () => {
+                            "use server";
+                            await leaveTeam();
+                            redirect("/teams");
+                          }}
+                        >
+                          <Button
+                            type="submit"
+                            variant="ghost"
+                            size="sm"
+                            className="text-orange-500 hover:bg-orange-950 hover:text-orange-400"
+                          >
+                            <LogOut className="h-4 w-4 mr-1" /> Leave
+                          </Button>
+                        </form>
+                      )}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+
+          {/* Leave Team Button for Leaders */}
+          {isLeader && members.length === 1 && (
+            <div className="mt-6 pt-6 border-t border-zinc-800">
+              <form
+                action={async () => {
+                  "use server";
+                  await leaveTeam();
+                  redirect("/teams");
+                }}
+              >
+                <Button
+                  type="submit"
+                  variant="outline"
+                  className="border-red-500/50 text-red-500 hover:bg-red-950 hover:text-red-400"
+                >
+                  <LogOut className="h-4 w-4 mr-2" /> Disband Team
+                </Button>
+              </form>
+              <p className="text-zinc-500 text-sm mt-2">
+                You&apos;re the only member. Leaving will disband the team.
+              </p>
+            </div>
+          )}
+          {isLeader && members.length > 1 && (
+            <div className="mt-6 pt-6 border-t border-zinc-800">
+              <form
+                action={async () => {
+                  "use server";
+                  await leaveTeam();
+                  redirect("/teams");
+                }}
+              >
+                <Button
+                  type="submit"
+                  variant="outline"
+                  className="border-orange-500/50 text-orange-500 hover:bg-orange-950 hover:text-orange-400"
+                >
+                  <LogOut className="h-4 w-4 mr-2" /> Leave Team
+                </Button>
+              </form>
+              <p className="text-zinc-500 text-sm mt-2">
+                Leadership will be transferred to another member.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

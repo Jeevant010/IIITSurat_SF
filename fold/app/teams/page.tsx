@@ -15,8 +15,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Users, Plus, Crown, Search } from "lucide-react";
 import { requestToJoinTeam } from "@/app/actions/join-actions";
 import connectDB from "@/lib/mongodb";
-import Team from "@/lib/models/Team";
-import User from "@/lib/models/User";
+import { User, Team } from "@/lib/models";
 import { Suspense } from "react";
 import LoadingScreen from "@/components/loading-screen";
 

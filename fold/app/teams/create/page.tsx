@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,8 +13,20 @@ import { Shield, ArrowRight, Users, Star, Trophy } from "lucide-react";
 import { createTeam } from "@/app/actions/team-actions";
 import { Suspense } from "react";
 import LoadingScreen from "@/components/loading-screen";
+import { getCurrentUser } from "@/lib/auth";
 
-function CreateTeamForm() {
+async function CreateTeamForm() {
+  // Auth check - redirect if not logged in
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
+
+  // If user already has a team, redirect to my-team
+  if (user.teamId) {
+    redirect("/teams/my-team");
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-black via-purple-950 to-black">
       {/* Visual Background Effect */}
