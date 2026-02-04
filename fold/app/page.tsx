@@ -8,14 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Trophy,
-  Users,
-  Calendar,
-  Swords,
-  Shield,
-  Target,
-} from "lucide-react";
+import { Trophy, Users, Calendar, Swords, Shield, Target } from "lucide-react";
 import { Suspense } from "react";
 import LoadingScreen from "@/components/loading-screen";
 import connectDB from "@/lib/mongodb";
@@ -24,16 +17,13 @@ import { Announcement, SiteSettings } from "@/lib/models";
 async function getPageData() {
   try {
     await connectDB();
-    
+
     // Get banner announcement
     const now = new Date();
     const banner = await Announcement.findOne({
       isActive: true,
       showOnBanner: true,
-      $or: [
-        { expiresAt: null },
-        { expiresAt: { $gt: now } },
-      ],
+      $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }],
     })
       .sort({ priority: -1, createdAt: -1 })
       .lean();
@@ -42,16 +32,20 @@ async function getPageData() {
     const settings = await SiteSettings.findOne().lean();
 
     return {
-      banner: banner ? {
-        title: banner.title,
-        content: banner.content,
-        type: banner.type,
-      } : null,
-      settings: settings ? {
-        heroTitle: settings.heroTitle,
-        heroSubtitle: settings.heroSubtitle,
-        announcementBanner: settings.announcementBanner,
-      } : null,
+      banner: banner
+        ? {
+            title: banner.title,
+            content: banner.content,
+            type: banner.type,
+          }
+        : null,
+      settings: settings
+        ? {
+            heroTitle: settings.heroTitle,
+            heroSubtitle: settings.heroSubtitle,
+            announcementBanner: settings.announcementBanner,
+          }
+        : null,
     };
   } catch (error) {
     console.error("Error fetching page data:", error);
@@ -66,18 +60,28 @@ async function HomePage() {
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-black via-yellow-950/20 to-black text-foreground">
       {/* Announcement Banner */}
       {(banner || settings?.announcementBanner) && (
-        <div className={`w-full py-3 px-4 text-center ${
-          banner?.type === "URGENT" ? "bg-red-500/20 border-b border-red-500/30" :
-          banner?.type === "WARNING" ? "bg-yellow-500/20 border-b border-yellow-500/30" :
-          banner?.type === "SUCCESS" ? "bg-green-500/20 border-b border-green-500/30" :
-          "bg-blue-500/20 border-b border-blue-500/30"
-        }`}>
-          <p className={`text-sm font-medium ${
-            banner?.type === "URGENT" ? "text-red-300" :
-            banner?.type === "WARNING" ? "text-yellow-300" :
-            banner?.type === "SUCCESS" ? "text-green-300" :
-            "text-blue-300"
-          }`}>
+        <div
+          className={`w-full py-3 px-4 text-center ${
+            banner?.type === "URGENT"
+              ? "bg-red-500/20 border-b border-red-500/30"
+              : banner?.type === "WARNING"
+                ? "bg-yellow-500/20 border-b border-yellow-500/30"
+                : banner?.type === "SUCCESS"
+                  ? "bg-green-500/20 border-b border-green-500/30"
+                  : "bg-blue-500/20 border-b border-blue-500/30"
+          }`}
+        >
+          <p
+            className={`text-sm font-medium ${
+              banner?.type === "URGENT"
+                ? "text-red-300"
+                : banner?.type === "WARNING"
+                  ? "text-yellow-300"
+                  : banner?.type === "SUCCESS"
+                    ? "text-green-300"
+                    : "text-blue-300"
+            }`}
+          >
             {banner?.type === "URGENT" && "🚨 "}
             {banner?.type === "WARNING" && "⚠️ "}
             {banner?.type === "SUCCESS" && "✅ "}
@@ -109,7 +113,8 @@ async function HomePage() {
           </h1>
 
           <p className="max-w-[700px] text-zinc-300 text-lg md:text-xl mb-10 z-10">
-            {settings?.heroSubtitle || "Build your clan, strategize your attacks, and dominate the battlefield! Join IIIT Surat's epic Clash of Clans tournament at Spring Fiesta 2026."}
+            {settings?.heroSubtitle ||
+              "Build your clan, strategize your attacks, and dominate the battlefield! Join IIIT Surat's epic Clash of Clans tournament at Spring Fiesta 2026."}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full justify-center z-10 mb-12">
@@ -143,8 +148,8 @@ async function HomePage() {
                 </div>
                 <CardTitle className="text-white">Build Your Clan</CardTitle>
                 <CardDescription className="text-zinc-400">
-                  Form your elite squad! Invite your best attackers and defenders
-                  to create an unstoppable clan.
+                  Form your elite squad! Invite your best attackers and
+                  defenders to create an unstoppable clan.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -169,8 +174,8 @@ async function HomePage() {
                 </div>
                 <CardTitle className="text-white">Win Prizes</CardTitle>
                 <CardDescription className="text-zinc-400">
-                  Top clans get amazing prizes! Track your performance live
-                  and compete for the championship trophy.
+                  Top clans get amazing prizes! Track your performance live and
+                  compete for the championship trophy.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -231,8 +236,8 @@ async function HomePage() {
                   Ready to Clash?
                 </h2>
                 <p className="text-zinc-300 text-lg mb-8">
-                  Register your clan now and prepare for the ultimate Clash of Clans
-                  showdown at Spring Fiesta 2026!
+                  Register your clan now and prepare for the ultimate Clash of
+                  Clans showdown at Spring Fiesta 2026!
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link href="/teams/create">

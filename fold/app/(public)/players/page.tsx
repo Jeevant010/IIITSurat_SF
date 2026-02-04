@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import connectDB from "@/lib/mongodb";
-import User from "@/lib/models/User";
+import { User, Team } from "@/lib/models"; // Import from index to ensure models are registered
 import { PublicPlayersClient } from "./players-client";
 
 export default async function PublicPlayersPage() {
