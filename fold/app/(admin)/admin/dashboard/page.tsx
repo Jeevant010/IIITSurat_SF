@@ -3,8 +3,7 @@ import { Users, Sword, Trophy, Activity } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 import connectDB from "@/lib/mongodb";
-import User from "@/lib/models/User";
-import Team from "@/lib/models/Team";
+import { User, Team } from "@/lib/models";
 
 export default async function AdminDashboard() {
   await connectDB();

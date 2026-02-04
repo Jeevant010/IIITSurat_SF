@@ -1,8 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import connectDB from "@/lib/mongodb";
-import User from "@/lib/models/User";
-import Team from "@/lib/models/Team";
+import { User, Team } from "@/lib/models";
 import { PlayerManagementClient } from "./player-management-client";
 
 export default async function AdminPlayersPage() {
