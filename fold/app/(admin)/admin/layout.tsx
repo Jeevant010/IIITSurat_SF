@@ -12,6 +12,7 @@ import {
   ClipboardList,
   Menu,
   X,
+  Megaphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -25,9 +26,10 @@ export default function AdminLayout({
   const navItems = [
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/admin/players", label: "Players", icon: Users },
-    { href: "/admin/teams", label: "Teams", icon: Sword },
+    { href: "/admin/teams", label: "Clans", icon: Sword },
     { href: "/admin/brackets", label: "Tournament Bracket", icon: Trophy },
     { href: "/admin/matches", label: "Match Results", icon: ClipboardList },
+    { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
     { href: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
@@ -44,10 +46,16 @@ export default function AdminLayout({
               className="md:hidden text-zinc-400 hover:text-white p-2"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
-              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {sidebarOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
             </Button>
             <Shield className="w-5 h-5 md:w-6 md:h-6 text-yellow-500" />
-            <span className="text-white font-bold text-base md:text-lg">Admin Panel</span>
+            <span className="text-white font-bold text-base md:text-lg">
+              Admin Panel
+            </span>
             <span className="text-xs bg-yellow-500 text-black px-2 py-1 rounded font-bold hidden sm:inline">
               GOD MODE
             </span>

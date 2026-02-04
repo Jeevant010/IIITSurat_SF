@@ -1,13 +1,17 @@
 export const dynamic = "force-dynamic";
 
 import connectDB from "@/lib/mongodb";
-import { User, Team, JoinRequest } from "@/lib/models";
+import { User, Team, JoinRequest, SiteSettings } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TeamManagementClient } from "./team-management-client";
 
 export default async function AdminTeamsPage() {
   await connectDB();
+
+  // Get site settings for max team size
+  let settings = await SiteSettings.findOne().lean();
+  const maxTeamSize = settings?.maxTeamSize || 5;
 
   // Fetch all teams with leader info and member counts
   const teamsData = await Team.find().populate("leaderId", "name email").lean();
@@ -132,6 +136,7 @@ export default async function AdminTeamsPage() {
           status: r.status,
           createdAt: r.createdAt.toISOString(),
         }))}
+        maxTeamSize={maxTeamSize}
       />
     </div>
   );
