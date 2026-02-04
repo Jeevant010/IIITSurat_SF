@@ -3,6 +3,8 @@ import mongoose, { Schema, model, models } from "mongoose";
 export interface ISiteSettings {
   _id?: string;
   siteName: string;
+  tournamentName: string; // e.g., "Clash of Clans Tournament"
+  eventName: string; // e.g., "Spring Fiesta 2026"
   eventDate: Date;
   registrationOpen: boolean;
   maxTeamSize: number;
@@ -12,12 +14,25 @@ export interface ISiteSettings {
   heroTitle: string;
   heroSubtitle: string;
   announcementBanner?: string;
+  // Game-specific settings
+  gameType: string; // e.g., "Clash of Clans"
+  rulesUrl?: string;
+  discordUrl?: string;
+  contactEmail?: string;
   updatedAt?: Date;
 }
 
 const SiteSettingsSchema = new Schema<ISiteSettings>(
   {
     siteName: {
+      type: String,
+      default: "Spring Fiesta 2026 - Clash of Clans",
+    },
+    tournamentName: {
+      type: String,
+      default: "Clash of Clans Tournament",
+    },
+    eventName: {
       type: String,
       default: "Spring Fiesta 2026",
     },
@@ -32,10 +47,13 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
     maxTeamSize: {
       type: Number,
       default: 5,
+      min: 1,
+      max: 50,
     },
     minTeamSize: {
       type: Number,
       default: 1,
+      min: 1,
     },
     allowTeamCreation: {
       type: Boolean,
@@ -47,13 +65,29 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
     },
     heroTitle: {
       type: String,
-      default: "Welcome to Spring Fiesta 2026",
+      default: "Clash of Clans Tournament",
     },
     heroSubtitle: {
       type: String,
-      default: "IIIT Surat's Premier Cultural Event",
+      default: "Spring Fiesta 2026 • IIIT Surat",
     },
     announcementBanner: {
+      type: String,
+      default: "",
+    },
+    gameType: {
+      type: String,
+      default: "Clash of Clans",
+    },
+    rulesUrl: {
+      type: String,
+      default: "",
+    },
+    discordUrl: {
+      type: String,
+      default: "",
+    },
+    contactEmail: {
       type: String,
       default: "",
     },
