@@ -11,14 +11,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  Settings as SettingsIcon, 
-  Save, 
-  Gamepad2, 
-  Users, 
+import {
+  Settings as SettingsIcon,
+  Save,
+  Gamepad2,
+  Users,
   Calendar,
   Globe,
-  Megaphone
+  Megaphone,
 } from "lucide-react";
 import { updateSiteSettings } from "@/app/actions/admin-actions";
 
@@ -38,7 +38,9 @@ interface SettingsClientProps {
   };
 }
 
-export default function SettingsClient({ initialSettings }: SettingsClientProps) {
+export default function SettingsClient({
+  initialSettings,
+}: SettingsClientProps) {
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState(initialSettings);
 
@@ -46,7 +48,7 @@ export default function SettingsClient({ initialSettings }: SettingsClientProps)
     setSaving(true);
     const result = await updateSiteSettings(settings);
     setSaving(false);
-    
+
     if (result.success) {
       alert("✅ Settings saved successfully!");
     } else {
@@ -74,7 +76,9 @@ export default function SettingsClient({ initialSettings }: SettingsClientProps)
               <Globe className="w-5 h-5 text-blue-400" />
               General Settings
             </CardTitle>
-            <CardDescription>Basic site configuration for Spring Fiesta</CardDescription>
+            <CardDescription>
+              Basic site configuration for Spring Fiesta
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -118,13 +122,20 @@ export default function SettingsClient({ initialSettings }: SettingsClientProps)
                 }
                 className="w-4 h-4 accent-yellow-500"
               />
-              <Label htmlFor="registrationOpen" className="cursor-pointer flex-1">
+              <Label
+                htmlFor="registrationOpen"
+                className="cursor-pointer flex-1"
+              >
                 Registration Open
               </Label>
               {settings.registrationOpen ? (
-                <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">OPEN</span>
+                <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">
+                  OPEN
+                </span>
               ) : (
-                <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">CLOSED</span>
+                <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">
+                  CLOSED
+                </span>
               )}
             </div>
           </CardContent>
@@ -137,7 +148,9 @@ export default function SettingsClient({ initialSettings }: SettingsClientProps)
               <Users className="w-5 h-5 text-green-400" />
               Team Configuration
             </CardTitle>
-            <CardDescription>Control team creation and clan sizes</CardDescription>
+            <CardDescription>
+              Control team creation and clan sizes
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -225,7 +238,9 @@ export default function SettingsClient({ initialSettings }: SettingsClientProps)
               <Gamepad2 className="w-5 h-5 text-yellow-400" />
               Landing Page Content
             </CardTitle>
-            <CardDescription>Customize the hero section for Clash of Clans tournament</CardDescription>
+            <CardDescription>
+              Customize the hero section for Clash of Clans tournament
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -263,7 +278,8 @@ export default function SettingsClient({ initialSettings }: SettingsClientProps)
               Quick Announcement Banner
             </CardTitle>
             <CardDescription>
-              Display a quick message banner across the site. For more announcements, use the Announcements page.
+              Display a quick message banner across the site. For more
+              announcements, use the Announcements page.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

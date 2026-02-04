@@ -23,6 +23,14 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Crown,
   UserMinus,
   Edit,
@@ -30,6 +38,8 @@ import {
   UserPlus,
   CheckCircle,
   Shield,
+  Plus,
+  Swords,
 } from "lucide-react";
 import {
   forceAddUserToTeam,
@@ -38,6 +48,7 @@ import {
   forceEditTeam,
   forceDeleteTeam,
   forceApproveJoinRequest,
+  forceCreateTeam,
 } from "@/app/actions/admin-actions";
 
 type Team = {
@@ -74,16 +85,27 @@ export function TeamManagementClient({
   teams,
   freeAgents,
   pendingRequests,
+  maxTeamSize = 5,
 }: {
   teams: Team[];
   freeAgents: FreeAgent[];
   pendingRequests: PendingRequest[];
+  maxTeamSize?: number;
 }) {
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [editingTeam, setEditingTeam] = useState<{
     name: string;
     description: string;
   } | null>(null);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [newTeam, setNewTeam] = useState({
+    name: "",
+    teamCode: "",
+    description: "",
+    leaderId: "",
+    maxMembers: maxTeamSize,
+  });
+  const [creating, setCreating] = useState(false);
 
   const handleAddUser = async (userId: string, teamId: string) => {
     const result = await forceAddUserToTeam(userId, teamId);
@@ -128,8 +150,137 @@ export function TeamManagementClient({
     window.location.reload();
   };
 
+  const handleCreateTeam = async () => {
+    if (!newTeam.name || !newTeam.teamCode) {
+      alert("Team name and code are required");
+      return;
+    }
+
+    setCreating(true);
+    const result = await forceCreateTeam(newTeam);
+    setCreating(false);
+
+    if (result.success) {
+      alert("✅ " + result.message);
+      setCreateDialogOpen(false);
+      setNewTeam({
+        name: "",
+        teamCode: "",
+        description: "",
+        leaderId: "",
+        maxMembers: maxTeamSize,
+      });
+      window.location.reload();
+    } else {
+      alert("❌ " + result.message);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Create Team Button */}
+      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+        <DialogTrigger asChild>
+          <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold">
+            <Plus className="w-4 h-4 mr-2" />
+            Create New Clan
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="bg-zinc-950 border-zinc-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Swords className="w-5 h-5 text-yellow-500" />
+              Create New Clan (Admin)
+            </DialogTitle>
+            <DialogDescription>
+              Create a new clan directly. Optionally assign a leader from free
+              agents.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label>Clan Name *</Label>
+              <Input
+                placeholder="e.g., Dragon Riders"
+                value={newTeam.name}
+                onChange={(e) =>
+                  setNewTeam({ ...newTeam, name: e.target.value })
+                }
+                className="bg-black border-zinc-700"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Clan Tag/Code * (2-6 characters)</Label>
+              <Input
+                placeholder="e.g., DRAG"
+                value={newTeam.teamCode}
+                onChange={(e) =>
+                  setNewTeam({
+                    ...newTeam,
+                    teamCode: e.target.value.toUpperCase(),
+                  })
+                }
+                className="bg-black border-zinc-700"
+                maxLength={6}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Description (optional)</Label>
+              <Input
+                placeholder="e.g., Elite warriors seeking glory"
+                value={newTeam.description}
+                onChange={(e) =>
+                  setNewTeam({ ...newTeam, description: e.target.value })
+                }
+                className="bg-black border-zinc-700"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Max Members</Label>
+              <Input
+                type="number"
+                min={1}
+                max={15}
+                value={newTeam.maxMembers}
+                onChange={(e) =>
+                  setNewTeam({
+                    ...newTeam,
+                    maxMembers: parseInt(e.target.value) || 5,
+                  })
+                }
+                className="bg-black border-zinc-700"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="leader-select">Assign Leader (optional)</Label>
+              <select
+                id="leader-select"
+                title="Select a leader for the clan"
+                value={newTeam.leaderId}
+                onChange={(e) =>
+                  setNewTeam({ ...newTeam, leaderId: e.target.value })
+                }
+                className="w-full bg-black border border-zinc-700 rounded-md p-2 text-white"
+              >
+                <option value="">No leader (empty clan)</option>
+                {freeAgents.map((agent) => (
+                  <option key={agent._id} value={agent._id}>
+                    {agent.name} ({agent.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Button
+              onClick={handleCreateTeam}
+              disabled={creating || !newTeam.name || !newTeam.teamCode}
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold"
+            >
+              {creating ? "Creating..." : "Create Clan"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Pending Requests Section */}
       {pendingRequests.length > 0 && (
         <Card className="bg-zinc-900 border-yellow-500/20">
@@ -186,7 +337,7 @@ export function TeamManagementClient({
                 </p>
               </div>
               <Badge variant="outline" className="text-zinc-400">
-                {team.memberCount}/5
+                {team.memberCount}/{maxTeamSize}
               </Badge>
             </CardHeader>
             <CardContent className="space-y-4">

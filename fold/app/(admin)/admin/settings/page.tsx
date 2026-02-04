@@ -9,7 +9,7 @@ export default async function SettingsPage() {
 
   // Get or create default settings
   let settings = await SiteSettings.findOne().lean();
-  
+
   if (!settings) {
     const created = await SiteSettings.create({
       siteName: "Spring Fiesta 2026 - Clash of Clans",
