@@ -6,7 +6,7 @@
 
 ```bash
 # Connect to your MongoDB
-mongo "mongodb+srv://username:password@cluster.mongodb.net/surat-spring-fiesta"
+mongo "............................."
 
 # Switch to the database
 use surat-spring-fiesta
