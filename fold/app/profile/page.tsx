@@ -22,6 +22,7 @@ import {
   Crown,
   Edit,
   Castle,
+  Tag,
 } from "lucide-react";
 import Link from "next/link";
 import connectDB from "@/lib/mongodb";
@@ -104,6 +105,16 @@ export default async function ProfilePage() {
                   <p className="text-xs text-zinc-500">Roll Number</p>
                   <p className="text-white font-medium">
                     {user.rollNumber || "Not set"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 bg-zinc-900/50 rounded-lg">
+                <Tag className="w-5 h-5 text-green-400" />
+                <div>
+                  <p className="text-xs text-zinc-500">Player Tag</p>
+                  <p className="text-white font-medium font-mono">
+                    {user.playerTag || "Not set"}
                   </p>
                 </div>
               </div>
@@ -220,6 +231,18 @@ export default async function ProfilePage() {
                     id="rollNumber"
                     name="rollNumber"
                     defaultValue={user.rollNumber || ""}
+                    className="bg-zinc-900 border-zinc-700 text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="playerTag" className="text-zinc-300">
+                    Player Tag
+                  </Label>
+                  <Input
+                    id="playerTag"
+                    name="playerTag"
+                    placeholder="#ABC123XYZ"
+                    defaultValue={user.playerTag || ""}
                     className="bg-zinc-900 border-zinc-700 text-white"
                   />
                 </div>

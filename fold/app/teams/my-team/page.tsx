@@ -14,12 +14,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Copy,
   Crown,
   UserMinus,
   CheckCircle,
   XCircle,
   LogOut,
+  ArrowRightLeft,
 } from "lucide-react";
 import connectDB from "@/lib/mongodb";
 import { User, Team, JoinRequest } from "@/lib/models";
@@ -27,8 +27,9 @@ import {
   approveJoinRequest,
   rejectJoinRequest,
 } from "@/app/actions/join-actions";
-import { leaveTeam, kickMember } from "@/app/actions/team-actions";
+import { leaveTeam, kickMember, transferLeadership } from "@/app/actions/team-actions";
 import { getCurrentUser } from "@/lib/auth";
+import { CopyCodeButton } from "./copy-code-button";
 
 // Helper to get initials for Avatars
 function getInitials(name: string) {
@@ -102,13 +103,7 @@ export default async function MyTeamPage() {
             <div className="text-xl font-mono text-yellow-400 font-bold tracking-wider">
               {team.teamCode}
             </div>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 text-zinc-400 hover:text-white"
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
+            <CopyCodeButton code={team.teamCode} />
           </CardContent>
         </Card>
       </div>
@@ -245,24 +240,41 @@ export default async function MyTeamPage() {
                     {member.ign || "Not Linked"}
                   </TableCell>
                   <TableCell className="text-right">
-                    {/* Only Leader can kick people (but not themselves) */}
+                    {/* Leader can transfer leadership to other members */}
                     {isLeader &&
                       member._id.toString() !== user._id.toString() && (
-                        <form
-                          action={async () => {
-                            "use server";
-                            await kickMember(member._id.toString());
-                          }}
-                        >
-                          <Button
-                            type="submit"
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-500 hover:bg-red-950 hover:text-red-400"
+                        <div className="flex justify-end gap-2">
+                          <form
+                            action={async () => {
+                              "use server";
+                              await transferLeadership(member._id.toString());
+                            }}
                           >
-                            <UserMinus className="h-4 w-4 mr-1" /> Kick
-                          </Button>
-                        </form>
+                            <Button
+                              type="submit"
+                              variant="ghost"
+                              size="sm"
+                              className="text-yellow-500 hover:bg-yellow-950 hover:text-yellow-400"
+                            >
+                              <ArrowRightLeft className="h-4 w-4 mr-1" /> Make Leader
+                            </Button>
+                          </form>
+                          <form
+                            action={async () => {
+                              "use server";
+                              await kickMember(member._id.toString());
+                            }}
+                          >
+                            <Button
+                              type="submit"
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:bg-red-950 hover:text-red-400"
+                            >
+                              <UserMinus className="h-4 w-4 mr-1" /> Kick
+                            </Button>
+                          </form>
+                        </div>
                       )}
                     {/* Members (non-leaders) can leave */}
                     {!isLeader &&

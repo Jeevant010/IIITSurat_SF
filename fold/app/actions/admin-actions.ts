@@ -8,9 +8,21 @@ import {
   JoinRequest,
   SiteSettings,
   Announcement,
+  Match,
 } from "@/lib/models";
 import mongoose from "mongoose";
 import { getCurrentUser } from "@/lib/auth";
+
+// Helper function to check if team has war history
+async function teamHasWarHistory(teamId: mongoose.Types.ObjectId): Promise<boolean> {
+  const matchCount = await Match.countDocuments({
+    $or: [
+      { team1Id: teamId },
+      { team2Id: teamId },
+    ],
+  });
+  return matchCount > 0;
+}
 
 // ============================================
 // ADMIN AUTH CHECK - All admin actions MUST call this first
@@ -76,11 +88,13 @@ export async function forceRemoveUserFromTeam(userId: string) {
       return { success: false, message: "User not found" };
     }
 
+    const userTeamId = user.teamId;
+
     // Check if they're a leader
     if (user.teamRole === "LEADER") {
       const team = await Team.findById(user.teamId);
       if (team) {
-        // Promote another member to leader or delete team
+        // Promote another member to leader or mark for deletion check
         const newLeader = await User.findOne({
           teamId: user.teamId,
           _id: { $ne: userId },
@@ -90,11 +104,8 @@ export async function forceRemoveUserFromTeam(userId: string) {
           // Promote first member
           await User.findByIdAndUpdate(newLeader._id, { teamRole: "LEADER" });
           await Team.findByIdAndUpdate(team._id, { leaderId: newLeader._id });
-        } else {
-          // No other members, delete team
-          await Team.findByIdAndDelete(team._id);
-          await JoinRequest.deleteMany({ teamId: team._id });
         }
+        // Note: Team deletion handled after user is removed
       }
     }
 
@@ -103,6 +114,18 @@ export async function forceRemoveUserFromTeam(userId: string) {
       teamId: null,
       teamRole: null,
     });
+
+    // Check if team should be deleted (no members + no war history)
+    if (userTeamId) {
+      const memberCount = await User.countDocuments({ teamId: userTeamId });
+      if (memberCount === 0) {
+        const hasWarHistory = await teamHasWarHistory(userTeamId);
+        if (!hasWarHistory) {
+          await Team.findByIdAndDelete(userTeamId);
+          await JoinRequest.deleteMany({ teamId: userTeamId });
+        }
+      }
+    }
 
     revalidatePath("/admin/teams");
     revalidatePath("/admin/players");
@@ -318,6 +341,7 @@ export async function forceEditPlayer(
     ign?: string;
     townHall?: number | null;
     phone?: string;
+    playerTag?: string;
     role?: "USER" | "ADMIN";
     isProfileComplete?: boolean;
   },
@@ -376,6 +400,7 @@ export async function forceCreatePlayer(data: {
   ign?: string;
   townHall?: number;
   phone?: string;
+  playerTag?: string;
 }) {
   await requireAdmin();
   await connectDB();

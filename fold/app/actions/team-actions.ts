@@ -3,9 +3,37 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import connectDB from "@/lib/mongodb";
-import { User, Team, JoinRequest } from "@/lib/models";
+import { User, Team, JoinRequest, Match } from "@/lib/models";
 import { getCurrentUser } from "@/lib/auth";
 import mongoose from "mongoose";
+
+// Helper function to check if team has war history
+async function teamHasWarHistory(teamId: mongoose.Types.ObjectId): Promise<boolean> {
+  const matchCount = await Match.countDocuments({
+    $or: [
+      { team1Id: teamId },
+      { team2Id: teamId },
+    ],
+  });
+  return matchCount > 0;
+}
+
+// Helper function to delete team if no members and no war history
+async function deleteTeamIfEmpty(teamId: mongoose.Types.ObjectId): Promise<void> {
+  const memberCount = await User.countDocuments({ teamId: teamId });
+  
+  if (memberCount === 0) {
+    // Check if team has played any matches
+    const hasWarHistory = await teamHasWarHistory(teamId);
+    
+    if (!hasWarHistory) {
+      // No members and no war history - delete the team
+      await Team.findByIdAndDelete(teamId);
+      await JoinRequest.deleteMany({ teamId: teamId });
+    }
+    // If team has war history, keep it for records (admin can delete manually)
+  }
+}
 
 // ============================================
 // CREATE TEAM
@@ -135,11 +163,8 @@ export async function leaveTeam(): Promise<{
         // Promote new leader
         await User.findByIdAndUpdate(newLeader._id, { teamRole: "LEADER" });
         await Team.findByIdAndUpdate(team._id, { leaderId: newLeader._id });
-      } else {
-        // No other members, delete the team
-        await Team.findByIdAndDelete(team._id);
-        await JoinRequest.deleteMany({ teamId: team._id });
       }
+      // Note: Team deletion handled after user is removed
     }
 
     // Remove user from team
@@ -147,6 +172,9 @@ export async function leaveTeam(): Promise<{
       teamId: null,
       teamRole: null,
     });
+
+    // Check if team should be deleted (no members + no war history)
+    await deleteTeamIfEmpty(team._id);
 
     revalidatePath("/teams");
     revalidatePath("/teams/my-team");

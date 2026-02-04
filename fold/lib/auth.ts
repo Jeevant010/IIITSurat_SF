@@ -22,7 +22,9 @@ export interface AuthUser {
   teamRole: "LEADER" | "MEMBER" | null;
   isProfileComplete: boolean;
   avatarUrl: string | null;
+  avatarId: number | null;
   ign: string | null;
+  playerTag: string | null;
   townHall: number | null;
   rollNumber: string | null;
   phone: string | null;
@@ -56,7 +58,9 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       teamRole: user.teamRole || null,
       isProfileComplete: user.isProfileComplete || false,
       avatarUrl: user.avatarUrl || null,
+      avatarId: user.avatarId || null,
       ign: user.ign || null,
+      playerTag: user.playerTag || null,
       townHall: user.townHall || null,
       rollNumber: user.rollNumber || null,
       phone: user.phone || null,

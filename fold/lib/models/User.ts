@@ -10,9 +10,11 @@ export interface IUser {
   teamRole?: "LEADER" | "MEMBER" | null;
   rollNumber?: string | null;
   ign?: string | null; // In-Game Name
+  playerTag?: string | null; // Clash of Clans Player Tag (e.g., #ABC123)
   townHall?: number | null; // Clash of Clans Town Hall level (1-18)
   phone?: string | null;
   avatarUrl?: string | null;
+  avatarId?: number | null; // Selected avatar ID (1-20)
   isActive: boolean;
   isProfileComplete: boolean; // Has user filled required details?
   lastLogin?: Date | null;
@@ -76,6 +78,12 @@ const UserSchema = new Schema<IUser>(
       trim: true,
       maxlength: [50, "IGN cannot exceed 50 characters"],
     },
+    playerTag: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: [20, "Player tag cannot exceed 20 characters"],
+    },
     townHall: {
       type: Number,
       default: null,
@@ -90,6 +98,12 @@ const UserSchema = new Schema<IUser>(
     avatarUrl: {
       type: String,
       default: null,
+    },
+    avatarId: {
+      type: Number,
+      default: null,
+      min: 1,
+      max: 20,
     },
     isActive: {
       type: Boolean,

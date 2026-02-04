@@ -66,22 +66,6 @@ export async function requestToJoinTeam(
       };
     }
 
-    // Check for recently rejected request (prevent spam)
-    const recentRejection = await JoinRequest.findOne({
-      userId: user._id,
-      teamId: teamId,
-      status: "REJECTED",
-      updatedAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }, // 24 hours
-    });
-
-    if (recentRejection) {
-      return {
-        success: false,
-        message:
-          "Your request was recently rejected. Please wait 24 hours before requesting again.",
-      };
-    }
-
     // Create the request
     await JoinRequest.create({
       userId: user._id,

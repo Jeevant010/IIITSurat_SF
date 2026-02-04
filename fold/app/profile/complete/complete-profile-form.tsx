@@ -22,9 +22,41 @@ import {
   ArrowRight,
   Sparkles,
   Castle,
+  Tag,
+  Check,
 } from "lucide-react";
 import { completeProfile } from "@/app/actions/profile-actions";
 import { AuthUser } from "@/lib/auth";
+
+// Predefined avatar options (using DiceBear API with different seeds)
+const AVATAR_OPTIONS = [
+  { id: 1, seed: "warrior1", style: "adventurer" },
+  { id: 2, seed: "mage2", style: "adventurer" },
+  { id: 3, seed: "archer3", style: "adventurer" },
+  { id: 4, seed: "knight4", style: "adventurer" },
+  { id: 5, seed: "wizard5", style: "adventurer" },
+  { id: 6, seed: "barbarian6", style: "adventurer" },
+  { id: 7, seed: "ninja7", style: "adventurer" },
+  { id: 8, seed: "dragon8", style: "adventurer" },
+  { id: 9, seed: "golem9", style: "bottts" },
+  { id: 10, seed: "pekka10", style: "bottts" },
+  { id: 11, seed: "hog11", style: "avataaars" },
+  { id: 12, seed: "witch12", style: "avataaars" },
+  { id: 13, seed: "giant13", style: "avataaars" },
+  { id: 14, seed: "healer14", style: "avataaars" },
+  { id: 15, seed: "lava15", style: "fun-emoji" },
+  { id: 16, seed: "electro16", style: "fun-emoji" },
+  { id: 17, seed: "ice17", style: "lorelei" },
+  { id: 18, seed: "inferno18", style: "lorelei" },
+  { id: 19, seed: "royal19", style: "micah" },
+  { id: 20, seed: "legend20", style: "micah" },
+];
+
+function getAvatarUrl(avatarId: number): string {
+  const avatar = AVATAR_OPTIONS.find((a) => a.id === avatarId);
+  if (!avatar) return `https://api.dicebear.com/7.x/adventurer/svg?seed=default`;
+  return `https://api.dicebear.com/7.x/${avatar.style}/svg?seed=${avatar.seed}`;
+}
 
 interface Props {
   user: AuthUser;
@@ -34,11 +66,15 @@ export function CompleteProfileForm({ user }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedAvatar, setSelectedAvatar] = useState<number>(user.avatarId || 1);
 
   async function handleSubmit(formData: FormData) {
     setLoading(true);
     setError("");
     toast.loading("Saving your profile...", { id: "profile-save" });
+
+    // Add selected avatar to form data
+    formData.set("avatarId", selectedAvatar.toString());
 
     const result = await completeProfile(formData);
 
@@ -78,9 +114,10 @@ export function CompleteProfileForm({ user }: Props) {
       {/* Profile Card */}
       <Card className="border-purple-500/20 bg-zinc-950/80 backdrop-blur-xl shadow-2xl">
         <CardHeader className="text-center pb-2">
+          {/* Avatar Selection */}
           <div className="mx-auto mb-4">
-            <Avatar className="w-20 h-20 border-4 border-purple-500/50">
-              <AvatarImage src={user.avatarUrl || ""} />
+            <Avatar className="w-24 h-24 border-4 border-purple-500/50">
+              <AvatarImage src={getAvatarUrl(selectedAvatar)} />
               <AvatarFallback className="bg-purple-600 text-white text-xl">
                 {user.name?.charAt(0)?.toUpperCase() || "?"}
               </AvatarFallback>
@@ -90,10 +127,43 @@ export function CompleteProfileForm({ user }: Props) {
           <CardDescription className="text-zinc-400">
             {user.email}
           </CardDescription>
+          
+          {/* Avatar Grid */}
+          <div className="mt-4">
+            <p className="text-xs text-zinc-500 mb-2">Choose your avatar:</p>
+            <div className="grid grid-cols-10 gap-1.5 max-h-24 overflow-y-auto p-1">
+              {AVATAR_OPTIONS.map((avatar) => (
+                <button
+                  key={avatar.id}
+                  type="button"
+                  onClick={() => setSelectedAvatar(avatar.id)}
+                  className={`relative w-8 h-8 rounded-full overflow-hidden border-2 transition-all ${
+                    selectedAvatar === avatar.id
+                      ? "border-purple-500 ring-2 ring-purple-500/50 scale-110"
+                      : "border-zinc-700 hover:border-zinc-500"
+                  }`}
+                >
+                  <img
+                    src={getAvatarUrl(avatar.id)}
+                    alt={`Avatar ${avatar.id}`}
+                    className="w-full h-full"
+                  />
+                  {selectedAvatar === avatar.id && (
+                    <div className="absolute inset-0 bg-purple-500/30 flex items-center justify-center">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
         </CardHeader>
 
         <CardContent>
           <form action={handleSubmit} className="space-y-5">
+            {/* Hidden avatar field */}
+            <input type="hidden" name="avatarId" value={selectedAvatar} />
+            
             {/* Display Name */}
             <div className="space-y-2">
               <Label
@@ -132,6 +202,27 @@ export function CompleteProfileForm({ user }: Props) {
               />
               <p className="text-xs text-zinc-500">
                 This is the name others will see in competitions
+              </p>
+            </div>
+
+            {/* Player Tag (Optional) */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="playerTag"
+                className="text-zinc-300 flex items-center gap-2"
+              >
+                <Tag className="w-4 h-4" />
+                Player Tag (Optional)
+              </Label>
+              <Input
+                id="playerTag"
+                name="playerTag"
+                maxLength={15}
+                placeholder="e.g., #ABC123XYZ"
+                className="bg-zinc-900 border-zinc-700 text-white focus:border-purple-500"
+              />
+              <p className="text-xs text-zinc-500">
+                Your Clash of Clans player tag (found in profile)
               </p>
             </div>
 

@@ -56,6 +56,7 @@ interface Player {
   name: string;
   rollNumber?: string | null;
   ign?: string | null;
+  playerTag?: string | null;
   townHall?: number | null;
   phone?: string | null;
   role?: "USER" | "ADMIN";
@@ -103,6 +104,7 @@ export function PlayerManagementClient({
     name: "",
     rollNumber: "",
     ign: "",
+    playerTag: "",
     townHall: "",
     phone: "",
   });
@@ -111,6 +113,7 @@ export function PlayerManagementClient({
     email: "",
     rollNumber: "",
     ign: "",
+    playerTag: "",
     townHall: "",
     phone: "",
     role: "USER" as "USER" | "ADMIN",
@@ -235,6 +238,7 @@ export function PlayerManagementClient({
         name: "",
         rollNumber: "",
         ign: "",
+        playerTag: "",
         townHall: "",
         phone: "",
       });
@@ -254,6 +258,7 @@ export function PlayerManagementClient({
       email: player.email || "",
       rollNumber: player.rollNumber || "",
       ign: player.ign || "",
+      playerTag: player.playerTag || "",
       townHall: player.townHall?.toString() || "",
       phone: player.phone || "",
       role: player.role || "USER",
@@ -505,12 +510,26 @@ export function PlayerManagementClient({
                   className="w-full h-10 px-3 bg-black border border-zinc-700 text-white rounded-md"
                 >
                   <option value="">Select TH</option>
-                  {[...Array(17)].map((_, i) => (
+                  {[...Array(18)].map((_, i) => (
                     <option key={i + 1} value={i + 1}>
                       TH {i + 1}
                     </option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <Label className="text-zinc-300">Player Tag</Label>
+                <Input
+                  placeholder="#ABC123XYZ"
+                  value={createFormData.playerTag}
+                  onChange={(e) =>
+                    setCreateFormData({
+                      ...createFormData,
+                      playerTag: e.target.value,
+                    })
+                  }
+                  className="bg-black border-zinc-700 text-white"
+                />
               </div>
               <div>
                 <Label className="text-zinc-300">Phone</Label>
@@ -711,12 +730,26 @@ export function PlayerManagementClient({
                   className="w-full h-10 px-3 bg-black border border-zinc-700 text-white rounded-md"
                 >
                   <option value="">None</option>
-                  {[...Array(17)].map((_, i) => (
+                  {[...Array(18)].map((_, i) => (
                     <option key={i + 1} value={i + 1}>
                       TH {i + 1}
                     </option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <Label className="text-zinc-300">Player Tag</Label>
+                <Input
+                  placeholder="#ABC123XYZ"
+                  value={editFormData.playerTag}
+                  onChange={(e) =>
+                    setEditFormData({
+                      ...editFormData,
+                      playerTag: e.target.value,
+                    })
+                  }
+                  className="bg-black border-zinc-700 text-white"
+                />
               </div>
               <div>
                 <Label className="text-zinc-300">Roll Number</Label>
