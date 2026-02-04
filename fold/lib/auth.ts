@@ -23,6 +23,7 @@ export interface AuthUser {
   isProfileComplete: boolean;
   avatarUrl: string | null;
   ign: string | null;
+  townHall: number | null;
   rollNumber: string | null;
   phone: string | null;
 }
@@ -56,6 +57,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       isProfileComplete: user.isProfileComplete || false,
       avatarUrl: user.avatarUrl || null,
       ign: user.ign || null,
+      townHall: user.townHall || null,
       rollNumber: user.rollNumber || null,
       phone: user.phone || null,
     };

@@ -10,6 +10,7 @@ export interface IUser {
   teamRole?: "LEADER" | "MEMBER" | null;
   rollNumber?: string | null;
   ign?: string | null; // In-Game Name
+  townHall?: number | null; // Clash of Clans Town Hall level (1-18)
   phone?: string | null;
   avatarUrl?: string | null;
   isActive: boolean;
@@ -74,6 +75,12 @@ const UserSchema = new Schema<IUser>(
       default: null,
       trim: true,
       maxlength: [50, "IGN cannot exceed 50 characters"],
+    },
+    townHall: {
+      type: Number,
+      default: null,
+      min: [1, "Town Hall must be at least 1"],
+      max: [18, "Town Hall cannot exceed 18"],
     },
     phone: {
       type: String,
