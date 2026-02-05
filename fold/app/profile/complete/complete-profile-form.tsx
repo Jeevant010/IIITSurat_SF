@@ -27,37 +27,7 @@ import {
 } from "lucide-react";
 import { completeProfile } from "@/app/actions/profile-actions";
 import { AuthUser } from "@/lib/auth";
-
-// Predefined avatar options (using DiceBear API with different seeds)
-const AVATAR_OPTIONS = [
-  { id: 1, seed: "warrior1", style: "adventurer" },
-  { id: 2, seed: "mage2", style: "adventurer" },
-  { id: 3, seed: "archer3", style: "adventurer" },
-  { id: 4, seed: "knight4", style: "adventurer" },
-  { id: 5, seed: "wizard5", style: "adventurer" },
-  { id: 6, seed: "barbarian6", style: "adventurer" },
-  { id: 7, seed: "ninja7", style: "adventurer" },
-  { id: 8, seed: "dragon8", style: "adventurer" },
-  { id: 9, seed: "golem9", style: "bottts" },
-  { id: 10, seed: "pekka10", style: "bottts" },
-  { id: 11, seed: "hog11", style: "avataaars" },
-  { id: 12, seed: "witch12", style: "avataaars" },
-  { id: 13, seed: "giant13", style: "avataaars" },
-  { id: 14, seed: "healer14", style: "avataaars" },
-  { id: 15, seed: "lava15", style: "fun-emoji" },
-  { id: 16, seed: "electro16", style: "fun-emoji" },
-  { id: 17, seed: "ice17", style: "lorelei" },
-  { id: 18, seed: "inferno18", style: "lorelei" },
-  { id: 19, seed: "royal19", style: "micah" },
-  { id: 20, seed: "legend20", style: "micah" },
-];
-
-function getAvatarUrl(avatarId: number): string {
-  const avatar = AVATAR_OPTIONS.find((a) => a.id === avatarId);
-  if (!avatar)
-    return `https://api.dicebear.com/7.x/adventurer/svg?seed=default`;
-  return `https://api.dicebear.com/7.x/${avatar.style}/svg?seed=${avatar.seed}`;
-}
+import { AVATAR_OPTIONS, getAvatarUrlById } from "@/lib/avatar";
 
 interface Props {
   user: AuthUser;
@@ -120,7 +90,7 @@ export function CompleteProfileForm({ user }: Props) {
           {/* Avatar Selection */}
           <div className="mx-auto mb-4">
             <Avatar className="w-24 h-24 border-4 border-purple-500/50">
-              <AvatarImage src={getAvatarUrl(selectedAvatar)} />
+              <AvatarImage src={getAvatarUrlById(selectedAvatar)} />
               <AvatarFallback className="bg-purple-600 text-white text-xl">
                 {user.name?.charAt(0)?.toUpperCase() || "?"}
               </AvatarFallback>
@@ -147,7 +117,7 @@ export function CompleteProfileForm({ user }: Props) {
                   }`}
                 >
                   <img
-                    src={getAvatarUrl(avatar.id)}
+                    src={getAvatarUrlById(avatar.id)}
                     alt={`Avatar ${avatar.id}`}
                     className="w-full h-full"
                   />
@@ -258,6 +228,7 @@ export function CompleteProfileForm({ user }: Props) {
               <select
                 id="townHall"
                 name="townHall"
+                title="Select your Town Hall level"
                 required
                 className="w-full h-10 px-3 bg-zinc-900 border border-zinc-700 text-white rounded-md focus:border-purple-500 focus:outline-none"
               >
