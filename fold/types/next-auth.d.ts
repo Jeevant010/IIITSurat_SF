@@ -10,6 +10,7 @@ declare module "next-auth" {
       isProfileComplete: boolean;
       ign: string | null;
       rollNumber: string | null;
+      avatarId: number | null;
     } & DefaultSession["user"];
   }
 
@@ -20,6 +21,7 @@ declare module "next-auth" {
     isProfileComplete?: boolean;
     ign?: string | null;
     rollNumber?: string | null;
+    avatarId?: number | null;
   }
 }
 
