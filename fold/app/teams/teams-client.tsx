@@ -505,7 +505,10 @@ export function TeamsClient({
       </Dialog>
 
       {/* Join by Code Dialog */}
-      <Dialog open={joinByCodeDialogOpen} onOpenChange={setJoinByCodeDialogOpen}>
+      <Dialog
+        open={joinByCodeDialogOpen}
+        onOpenChange={setJoinByCodeDialogOpen}
+      >
         <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -513,7 +516,8 @@ export function TeamsClient({
               Join with Invite Code
             </DialogTitle>
             <DialogDescription className="text-zinc-400">
-              Enter the team invite code that was shared with you to request to join.
+              Enter the team invite code that was shared with you to request to
+              join.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">

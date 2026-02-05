@@ -90,7 +90,9 @@ export default async function SettingsPage() {
                 {/* Current Profile */}
                 <div className="flex items-center gap-4 p-4 bg-zinc-900/50 rounded-lg">
                   <Avatar className="w-16 h-16 border-2 border-purple-500/50">
-                    <AvatarImage src={getAvatarUrl(currentUser.avatarId, currentUser.name)} />
+                    <AvatarImage
+                      src={getAvatarUrl(currentUser.avatarId, currentUser.name)}
+                    />
                     <AvatarFallback className="bg-purple-600 text-white text-xl">
                       {currentUser.name?.charAt(0)?.toUpperCase() || "?"}
                     </AvatarFallback>
@@ -113,7 +115,10 @@ export default async function SettingsPage() {
                       )}
                     </div>
                   </div>
-                  <a href="/profile" className="text-purple-400 hover:text-purple-300 text-sm underline">
+                  <a
+                    href="/profile"
+                    className="text-purple-400 hover:text-purple-300 text-sm underline"
+                  >
                     Change Avatar
                   </a>
                 </div>

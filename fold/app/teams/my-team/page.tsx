@@ -114,7 +114,8 @@ export default async function MyTeamPage() {
             </div>
             <p className="text-xs text-zinc-500 mt-2">
               Share this code with players. They can use it on the{" "}
-              <span className="text-yellow-400">Teams</span> page to request to join.
+              <span className="text-yellow-400">Teams</span> page to request to
+              join.
             </p>
           </CardContent>
         </Card>
@@ -122,42 +123,66 @@ export default async function MyTeamPage() {
 
       {/* TH RESTRICTIONS INFO */}
       {(() => {
-        const thCounts = getTHCounts(members.map(m => ({ townHall: m.townHall })));
+        const thCounts = getTHCounts(
+          members.map((m) => ({ townHall: m.townHall })),
+        );
         // Calculate available slots
         const th18Slots = 1;
         const th17Slots = 1 + Math.max(0, th18Slots - thCounts.th18);
         const th16Slots = 1 + Math.max(0, th17Slots - thCounts.th17);
         const th15Slots = 1 + Math.max(0, th16Slots - thCounts.th16);
-        
+
         return (
           <Card className="bg-zinc-900/50 border-zinc-800">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-zinc-400">Town Hall Slot Availability</CardTitle>
+              <CardTitle className="text-sm text-zinc-400">
+                Town Hall Slot Availability
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <div className={`p-3 rounded-lg text-center ${thCounts.th18 >= th18Slots ? 'bg-red-500/20 border border-red-500/30' : 'bg-green-500/10 border border-green-500/20'}`}>
+                <div
+                  className={`p-3 rounded-lg text-center ${thCounts.th18 >= th18Slots ? "bg-red-500/20 border border-red-500/30" : "bg-green-500/10 border border-green-500/20"}`}
+                >
                   <div className="text-lg font-bold text-white">TH 18</div>
-                  <div className={`text-sm ${thCounts.th18 >= th18Slots ? 'text-red-400' : 'text-green-400'}`}>
-                    {thCounts.th18}/{th18Slots} {thCounts.th18 >= th18Slots ? '(FULL)' : ''}
+                  <div
+                    className={`text-sm ${thCounts.th18 >= th18Slots ? "text-red-400" : "text-green-400"}`}
+                  >
+                    {thCounts.th18}/{th18Slots}{" "}
+                    {thCounts.th18 >= th18Slots ? "(FULL)" : ""}
                   </div>
                 </div>
-                <div className={`p-3 rounded-lg text-center ${thCounts.th17 >= th17Slots ? 'bg-red-500/20 border border-red-500/30' : 'bg-green-500/10 border border-green-500/20'}`}>
+                <div
+                  className={`p-3 rounded-lg text-center ${thCounts.th17 >= th17Slots ? "bg-red-500/20 border border-red-500/30" : "bg-green-500/10 border border-green-500/20"}`}
+                >
                   <div className="text-lg font-bold text-white">TH 17</div>
-                  <div className={`text-sm ${thCounts.th17 >= th17Slots ? 'text-red-400' : 'text-green-400'}`}>
-                    {thCounts.th17}/{th17Slots} {thCounts.th17 >= th17Slots ? '(FULL)' : ''}
+                  <div
+                    className={`text-sm ${thCounts.th17 >= th17Slots ? "text-red-400" : "text-green-400"}`}
+                  >
+                    {thCounts.th17}/{th17Slots}{" "}
+                    {thCounts.th17 >= th17Slots ? "(FULL)" : ""}
                   </div>
                 </div>
-                <div className={`p-3 rounded-lg text-center ${thCounts.th16 >= th16Slots ? 'bg-red-500/20 border border-red-500/30' : 'bg-green-500/10 border border-green-500/20'}`}>
+                <div
+                  className={`p-3 rounded-lg text-center ${thCounts.th16 >= th16Slots ? "bg-red-500/20 border border-red-500/30" : "bg-green-500/10 border border-green-500/20"}`}
+                >
                   <div className="text-lg font-bold text-white">TH 16</div>
-                  <div className={`text-sm ${thCounts.th16 >= th16Slots ? 'text-red-400' : 'text-green-400'}`}>
-                    {thCounts.th16}/{th16Slots} {thCounts.th16 >= th16Slots ? '(FULL)' : ''}
+                  <div
+                    className={`text-sm ${thCounts.th16 >= th16Slots ? "text-red-400" : "text-green-400"}`}
+                  >
+                    {thCounts.th16}/{th16Slots}{" "}
+                    {thCounts.th16 >= th16Slots ? "(FULL)" : ""}
                   </div>
                 </div>
-                <div className={`p-3 rounded-lg text-center ${thCounts.th15 >= th15Slots ? 'bg-red-500/20 border border-red-500/30' : 'bg-green-500/10 border border-green-500/20'}`}>
+                <div
+                  className={`p-3 rounded-lg text-center ${thCounts.th15 >= th15Slots ? "bg-red-500/20 border border-red-500/30" : "bg-green-500/10 border border-green-500/20"}`}
+                >
                   <div className="text-lg font-bold text-white">TH 15</div>
-                  <div className={`text-sm ${thCounts.th15 >= th15Slots ? 'text-red-400' : 'text-green-400'}`}>
-                    {thCounts.th15}/{th15Slots} {thCounts.th15 >= th15Slots ? '(FULL)' : ''}
+                  <div
+                    className={`text-sm ${thCounts.th15 >= th15Slots ? "text-red-400" : "text-green-400"}`}
+                  >
+                    {thCounts.th15}/{th15Slots}{" "}
+                    {thCounts.th15 >= th15Slots ? "(FULL)" : ""}
                   </div>
                 </div>
                 <div className="p-3 rounded-lg text-center bg-blue-500/10 border border-blue-500/20">
@@ -166,7 +191,8 @@ export default async function MyTeamPage() {
                 </div>
               </div>
               <p className="text-xs text-zinc-500 mt-3">
-                💡 Unused high TH slots cascade down. E.g., if no TH 18, then TH 17 can have 2 players.
+                💡 Unused high TH slots cascade down. E.g., if no TH 18, then TH
+                17 can have 2 players.
               </p>
             </CardContent>
           </Card>
@@ -187,13 +213,18 @@ export default async function MyTeamPage() {
           <CardContent>
             <div className="space-y-3">
               {pendingRequests.map((request: any) => {
-                const thCounts = getTHCounts(members.map(m => ({ townHall: m.townHall })));
-                const canJoin = canPlayerJoinTeam(request.userId.townHall, thCounts);
-                
+                const thCounts = getTHCounts(
+                  members.map((m) => ({ townHall: m.townHall })),
+                );
+                const canJoin = canPlayerJoinTeam(
+                  request.userId.townHall,
+                  thCounts,
+                );
+
                 return (
                   <div
                     key={request._id.toString()}
-                    className={`p-3 rounded-lg ${canJoin.allowed ? 'bg-zinc-800' : 'bg-red-900/20 border border-red-500/30'}`}
+                    className={`p-3 rounded-lg ${canJoin.allowed ? "bg-zinc-800" : "bg-red-900/20 border border-red-500/30"}`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -206,14 +237,18 @@ export default async function MyTeamPage() {
                           <p className="text-white font-medium flex items-center gap-2">
                             {request.userId.name}
                             {request.userId.townHall && (
-                              <Badge variant="outline" className="text-xs border-purple-500/50 text-purple-400">
+                              <Badge
+                                variant="outline"
+                                className="text-xs border-purple-500/50 text-purple-400"
+                              >
                                 TH {request.userId.townHall}
                               </Badge>
                             )}
                           </p>
                           <p className="text-xs text-zinc-500">
                             {request.userId.email}
-                            {request.userId.ign && ` • IGN: ${request.userId.ign}`}
+                            {request.userId.ign &&
+                              ` • IGN: ${request.userId.ign}`}
                           </p>
                         </div>
                       </div>

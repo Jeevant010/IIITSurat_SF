@@ -91,7 +91,10 @@ export async function Navbar() {
                       <div className="flex items-center gap-3 mb-4">
                         <Avatar className="h-10 w-10">
                           <AvatarImage
-                            src={getAvatarUrl(user.avatarId, user.name || undefined)}
+                            src={getAvatarUrl(
+                              user.avatarId,
+                              user.name || undefined,
+                            )}
                             alt={user.name || ""}
                           />
                           <AvatarFallback className="bg-purple-600 text-white">
@@ -162,7 +165,10 @@ export async function Navbar() {
                   >
                     <Avatar className="h-10 w-10">
                       <AvatarImage
-                        src={getAvatarUrl(user.avatarId, user.name || undefined)}
+                        src={getAvatarUrl(
+                          user.avatarId,
+                          user.name || undefined,
+                        )}
                         alt={user.name || ""}
                       />
                       <AvatarFallback className="bg-yellow-600 text-black font-bold">
