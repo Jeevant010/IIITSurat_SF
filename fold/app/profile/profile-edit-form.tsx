@@ -6,12 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Edit, Check, Loader2 } from "lucide-react";
 import { updateProfile } from "@/app/actions/profile-actions";
@@ -35,7 +30,7 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState<number>(
-    user.avatarId || 1
+    user.avatarId || 1,
   );
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 

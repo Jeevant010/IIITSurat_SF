@@ -10,14 +10,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Gamepad2,
-  Hash,
-  Users,
-  Crown,
-  Castle,
-  Tag,
-} from "lucide-react";
+import { Gamepad2, Hash, Users, Crown, Castle, Tag } from "lucide-react";
 import Link from "next/link";
 import connectDB from "@/lib/mongodb";
 import { Team } from "@/lib/models";
