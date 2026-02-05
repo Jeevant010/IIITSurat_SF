@@ -79,6 +79,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             session.user.isProfileComplete = dbUser.isProfileComplete;
             session.user.ign = dbUser.ign;
             session.user.rollNumber = dbUser.rollNumber;
+            session.user.avatarId = dbUser.avatarId || null;
           }
         } catch (error) {
           console.error("Session error:", error);

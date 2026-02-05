@@ -47,7 +47,11 @@ export async function joinTeamByCode(
     // Find team by code
     const team = await Team.findOne({ teamCode: cleanCode });
     if (!team) {
-      return { success: false, message: "No team found with that invite code. Please check and try again." };
+      return {
+        success: false,
+        message:
+          "No team found with that invite code. Please check and try again.",
+      };
     }
 
     // Check if team is accepting requests
@@ -263,7 +267,9 @@ export async function approveJoinRequest(
     }
 
     // Get current team members for TH validation
-    const teamMembers = await User.find({ teamId: request.teamId }).select("townHall").lean();
+    const teamMembers = await User.find({ teamId: request.teamId })
+      .select("townHall")
+      .lean();
     const thCounts = getTHCounts(teamMembers);
 
     // Validate TH restrictions
@@ -271,7 +277,9 @@ export async function approveJoinRequest(
     if (!thValidation.allowed) {
       return {
         success: false,
-        message: thValidation.reason || "Player cannot join due to Town Hall restrictions.",
+        message:
+          thValidation.reason ||
+          "Player cannot join due to Town Hall restrictions.",
       };
     }
 
