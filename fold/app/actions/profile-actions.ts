@@ -83,18 +83,20 @@ export async function updateProfile(formData: FormData) {
     if (townHall !== null && currentUser.teamId && townHall >= 15) {
       const user = await User.findById(currentUser._id);
       const currentTH = user?.townHall || 0;
-      
+
       // Only validate if changing to a HIGHER TH level (upgrading)
       if (townHall > currentTH) {
         // Get other team members (excluding self)
-        const teamMembers = await User.find({ 
+        const teamMembers = await User.find({
           teamId: currentUser.teamId,
-          _id: { $ne: currentUser._id }
-        }).select("townHall").lean();
-        
+          _id: { $ne: currentUser._id },
+        })
+          .select("townHall")
+          .lean();
+
         const thCounts = getTHCounts(teamMembers);
         const validation = canPlayerJoinTeam(townHall, thCounts);
-        
+
         if (!validation.allowed) {
           return {
             success: false,
@@ -124,7 +126,7 @@ export async function updateProfile(formData: FormData) {
     revalidatePath("/teams");
     revalidatePath("/teams/my-team");
     revalidatePath("/leaderboard");
-    
+
     return { success: true, message: "Profile updated!" };
   } catch (error) {
     console.error("Profile update error:", error);
