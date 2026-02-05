@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import connectDB from "@/lib/mongodb";
 import { User, Team, JoinRequest } from "@/lib/models";
+import { getAvatarUrl } from "@/lib/avatar";
 
 export const dynamic = "force-dynamic";
 
@@ -79,7 +80,7 @@ export default async function DashboardPage() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <Avatar className="w-16 h-16 border-4 border-purple-500/50">
-                <AvatarImage src={currentUser.avatarUrl || ""} />
+                <AvatarImage src={getAvatarUrl(currentUser.avatarId, currentUser.name)} />
                 <AvatarFallback className="bg-purple-600 text-white text-xl">
                   {currentUser.name?.charAt(0)?.toUpperCase() || "?"}
                 </AvatarFallback>
@@ -266,7 +267,7 @@ export default async function DashboardPage() {
                       {teamMembers.slice(0, 5).map((member: unknown) => {
                         const m = member as {
                           _id: { toString: () => string };
-                          avatarUrl?: string;
+                          avatarId?: number | null;
                           name: string;
                         };
                         return (
@@ -274,7 +275,7 @@ export default async function DashboardPage() {
                             key={m._id.toString()}
                             className="w-8 h-8 border-2 border-zinc-900"
                           >
-                            <AvatarImage src={m.avatarUrl || ""} />
+                            <AvatarImage src={getAvatarUrl(m.avatarId, m.name)} />
                             <AvatarFallback className="bg-purple-600 text-white text-xs">
                               {m.name.charAt(0)}
                             </AvatarFallback>

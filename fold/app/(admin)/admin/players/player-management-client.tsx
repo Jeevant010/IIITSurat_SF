@@ -500,6 +500,7 @@ export function PlayerManagementClient({
               <div>
                 <Label className="text-zinc-300">Town Hall Level</Label>
                 <select
+                  title="Select Town Hall level"
                   value={createFormData.townHall}
                   onChange={(e) =>
                     setCreateFormData({
@@ -720,6 +721,7 @@ export function PlayerManagementClient({
               <div>
                 <Label className="text-zinc-300">Town Hall</Label>
                 <select
+                  title="Select Town Hall level"
                   value={editFormData.townHall}
                   onChange={(e) =>
                     setEditFormData({
@@ -777,6 +779,7 @@ export function PlayerManagementClient({
               <div className="col-span-2">
                 <Label className="text-zinc-300">User Role</Label>
                 <select
+                  title="Select user role"
                   value={editFormData.role}
                   onChange={(e) =>
                     setEditFormData({

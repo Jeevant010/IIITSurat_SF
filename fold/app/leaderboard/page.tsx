@@ -17,6 +17,7 @@ import { Search, Trophy, Medal, Crown, Users, Gamepad2 } from "lucide-react";
 import Link from "next/link";
 import connectDB from "@/lib/mongodb";
 import { User, Team } from "@/lib/models";
+import { getAvatarUrl } from "@/lib/avatar";
 
 export default async function LeaderboardPage({
   searchParams,
@@ -373,6 +374,7 @@ export default async function LeaderboardPage({
                       _id: { toString: () => string };
                       name: string;
                       avatarUrl?: string;
+                      avatarId?: number | null;
                       rollNumber?: string;
                       ign?: string;
                       teamId?: {
@@ -389,7 +391,7 @@ export default async function LeaderboardPage({
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="w-9 h-9">
-                              <AvatarImage src={p.avatarUrl || ""} />
+                              <AvatarImage src={getAvatarUrl(p.avatarId, p.name)} />
                               <AvatarFallback className="bg-purple-600/50 text-white text-sm">
                                 {p.name?.charAt(0)?.toUpperCase()}
                               </AvatarFallback>
