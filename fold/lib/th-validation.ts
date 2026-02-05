@@ -1,13 +1,13 @@
 /**
  * Town Hall Restriction Validation
- * 
+ *
  * Rules:
  * - TH 18: Max 1 player per team
  * - TH 17: Max 1 player (can be 2 if no TH 18 in team)
  * - TH 16: Max 1 player (cascading slots from TH 17, 18)
  * - TH 15: Max 1 player (cascading slots from TH 16, 17, 18)
  * - TH 14 and below: Unlimited
- * 
+ *
  * The pattern: Each high TH level (15-18) has 1 "slot".
  * If a higher TH slot is unused, it cascades down to the next level.
  */
@@ -57,7 +57,7 @@ function calculateAvailableSlots(currentCounts: THCounts): THCounts {
  */
 export function canPlayerJoinTeam(
   playerTH: number | null | undefined,
-  currentCounts: THCounts
+  currentCounts: THCounts,
 ): { allowed: boolean; reason?: string } {
   // If player has no TH set, they can't join (they need to complete profile)
   if (!playerTH) {
@@ -87,7 +87,10 @@ export function canPlayerJoinTeam(
 
     case 17:
       if (currentCounts.th17 >= availableSlots.th17) {
-        const extra = availableSlots.th17 > 1 ? ` (${availableSlots.th17 - 1} extra slot from unused TH 18)` : "";
+        const extra =
+          availableSlots.th17 > 1
+            ? ` (${availableSlots.th17 - 1} extra slot from unused TH 18)`
+            : "";
         return {
           allowed: false,
           reason: `Team already has the maximum allowed TH 17 players (${availableSlots.th17})${extra}.`,
@@ -97,7 +100,10 @@ export function canPlayerJoinTeam(
 
     case 16:
       if (currentCounts.th16 >= availableSlots.th16) {
-        const extra = availableSlots.th16 > 1 ? ` (includes ${availableSlots.th16 - 1} cascaded slots from unused TH 17/18)` : "";
+        const extra =
+          availableSlots.th16 > 1
+            ? ` (includes ${availableSlots.th16 - 1} cascaded slots from unused TH 17/18)`
+            : "";
         return {
           allowed: false,
           reason: `Team already has the maximum allowed TH 16 players (${availableSlots.th16})${extra}.`,
@@ -107,7 +113,10 @@ export function canPlayerJoinTeam(
 
     case 15:
       if (currentCounts.th15 >= availableSlots.th15) {
-        const extra = availableSlots.th15 > 1 ? ` (includes ${availableSlots.th15 - 1} cascaded slots from unused TH 16/17/18)` : "";
+        const extra =
+          availableSlots.th15 > 1
+            ? ` (includes ${availableSlots.th15 - 1} cascaded slots from unused TH 16/17/18)`
+            : "";
         return {
           allowed: false,
           reason: `Team already has the maximum allowed TH 15 players (${availableSlots.th15})${extra}.`,
@@ -123,7 +132,9 @@ export function canPlayerJoinTeam(
  * Get the current TH counts for a team from an array of members
  * @param members - Array of team members with townHall property
  */
-export function getTHCounts(members: Array<{ townHall?: number | null }>): THCounts {
+export function getTHCounts(
+  members: Array<{ townHall?: number | null }>,
+): THCounts {
   return {
     th18: members.filter((m) => m.townHall === 18).length,
     th17: members.filter((m) => m.townHall === 17).length,
@@ -137,34 +148,34 @@ export function getTHCounts(members: Array<{ townHall?: number | null }>): THCou
  */
 export function getTHRestrictionSummary(currentCounts: THCounts): string {
   const available = calculateAvailableSlots(currentCounts);
-  
+
   const lines: string[] = [];
-  
+
   if (currentCounts.th18 < available.th18) {
     lines.push(`TH 18: ${currentCounts.th18}/${available.th18} slots used`);
   } else {
     lines.push(`TH 18: FULL (${available.th18}/${available.th18})`);
   }
-  
+
   if (currentCounts.th17 < available.th17) {
     lines.push(`TH 17: ${currentCounts.th17}/${available.th17} slots used`);
   } else {
     lines.push(`TH 17: FULL (${available.th17}/${available.th17})`);
   }
-  
+
   if (currentCounts.th16 < available.th16) {
     lines.push(`TH 16: ${currentCounts.th16}/${available.th16} slots used`);
   } else {
     lines.push(`TH 16: FULL (${available.th16}/${available.th16})`);
   }
-  
+
   if (currentCounts.th15 < available.th15) {
     lines.push(`TH 15: ${currentCounts.th15}/${available.th15} slots used`);
   } else {
     lines.push(`TH 15: FULL (${available.th15}/${available.th15})`);
   }
-  
+
   lines.push(`TH 14 and below: Unlimited`);
-  
+
   return lines.join("\n");
 }

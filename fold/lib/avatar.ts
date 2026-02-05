@@ -30,7 +30,10 @@ export const AVATAR_OPTIONS = [
  * @param name - Fallback: user's name for generating avatar
  * @returns URL string for the avatar image
  */
-export function getAvatarUrl(avatarId: number | null | undefined, name?: string): string {
+export function getAvatarUrl(
+  avatarId: number | null | undefined,
+  name?: string,
+): string {
   // If user has selected an avatar, use it
   if (avatarId && avatarId >= 1 && avatarId <= 20) {
     const avatar = AVATAR_OPTIONS.find((a) => a.id === avatarId);
@@ -38,7 +41,7 @@ export function getAvatarUrl(avatarId: number | null | undefined, name?: string)
       return `https://api.dicebear.com/7.x/${avatar.style}/svg?seed=${avatar.seed}`;
     }
   }
-  
+
   // Fallback to name-based avatar or default
   const seed = name || "default";
   return `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}`;
