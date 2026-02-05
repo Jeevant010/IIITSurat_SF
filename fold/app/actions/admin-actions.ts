@@ -12,6 +12,7 @@ import {
 } from "@/lib/models";
 import mongoose from "mongoose";
 import { getCurrentUser } from "@/lib/auth";
+import { canPlayerJoinTeam, getTHCounts } from "@/lib/th-validation";
 
 // Helper function to check if team has war history
 async function teamHasWarHistory(
@@ -37,7 +38,7 @@ async function requireAdmin() {
   return user;
 }
 
-// GOD MODE: Force add user to team (bypasses approval)
+// GOD MODE: Force add user to team (bypasses approval but respects TH restrictions)
 export async function forceAddUserToTeam(userId: string, teamId: string) {
   await requireAdmin(); // Security check
   await connectDB();
@@ -48,12 +49,45 @@ export async function forceAddUserToTeam(userId: string, teamId: string) {
       return { success: false, message: "Team not found" };
     }
 
+    // Get the user being added
+    const userToAdd = await User.findById(userId);
+    if (!userToAdd) {
+      return { success: false, message: "User not found" };
+    }
+
+    // Check if user has set their Town Hall level
+    if (!userToAdd.townHall) {
+      return {
+        success: false,
+        message: "User must set their Town Hall level before joining a team.",
+      };
+    }
+
     // Check team size
     const memberCount = await User.countDocuments({
       teamId: new mongoose.Types.ObjectId(teamId),
     });
     if (memberCount >= 5) {
       return { success: false, message: "Team is full (max 5 members)" };
+    }
+
+    // Get current team members for TH validation
+    const teamMembers = await User.find({
+      teamId: new mongoose.Types.ObjectId(teamId),
+    })
+      .select("townHall")
+      .lean();
+    const thCounts = getTHCounts(teamMembers);
+
+    // Validate TH restrictions
+    const thValidation = canPlayerJoinTeam(userToAdd.townHall, thCounts);
+    if (!thValidation.allowed) {
+      return {
+        success: false,
+        message:
+          thValidation.reason ||
+          "Cannot add player due to Town Hall restrictions.",
+      };
     }
 
     // Update user

@@ -4,6 +4,108 @@ import { revalidatePath } from "next/cache";
 import connectDB from "@/lib/mongodb";
 import { User, Team, JoinRequest } from "@/lib/models";
 import { getCurrentUser } from "@/lib/auth";
+import { canPlayerJoinTeam, getTHCounts } from "@/lib/th-validation";
+
+// ============================================
+// JOIN TEAM BY INVITE CODE
+// ============================================
+export async function joinTeamByCode(
+  teamCode: string,
+  message?: string,
+): Promise<{ success: boolean; message: string; teamName?: string }> {
+  await connectDB();
+
+  try {
+    // Get currently logged in user
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return { success: false, message: "You must be logged in." };
+    }
+
+    // Clean up the team code (remove # if present, uppercase, trim)
+    const cleanCode = teamCode.replace(/^#/, "").toUpperCase().trim();
+
+    if (!cleanCode || cleanCode.length < 3) {
+      return { success: false, message: "Please enter a valid team code." };
+    }
+
+    // Refresh user data from DB
+    const user = await User.findById(currentUser._id);
+    if (!user) {
+      return { success: false, message: "User not found." };
+    }
+
+    // Check if user is already in a team
+    if (user.teamId) {
+      return {
+        success: false,
+        message:
+          "You are already in another clan! Leave your current clan first.",
+      };
+    }
+
+    // Find team by code
+    const team = await Team.findOne({ teamCode: cleanCode });
+    if (!team) {
+      return { success: false, message: "No team found with that invite code. Please check and try again." };
+    }
+
+    // Check if team is accepting requests
+    if (team.status !== "ACTIVE") {
+      return { success: false, message: "This team is not accepting members." };
+    }
+
+    // Check team size
+    const memberCount = await User.countDocuments({ teamId: team._id });
+    if (memberCount >= team.maxMembers) {
+      return {
+        success: false,
+        message: `Team "${team.name}" is full (${team.maxMembers}/${team.maxMembers} members).`,
+      };
+    }
+
+    // Check for existing pending request
+    const existingRequest = await JoinRequest.findOne({
+      userId: user._id,
+      teamId: team._id,
+      status: "PENDING",
+    });
+
+    if (existingRequest) {
+      return {
+        success: false,
+        message: `You already have a pending request for "${team.name}". Wait for the leader's response.`,
+      };
+    }
+
+    // Create the request
+    await JoinRequest.create({
+      userId: user._id,
+      teamId: team._id,
+      status: "PENDING",
+      message: message?.trim() || `Joined using invite code: ${cleanCode}`,
+    });
+
+    revalidatePath("/teams");
+    return {
+      success: true,
+      message: `Request sent to "${team.name}"! Waiting for Captain approval.`,
+      teamName: team.name,
+    };
+  } catch (error: any) {
+    console.error("Join by Code Error:", error);
+
+    // Handle duplicate request error
+    if (error.code === 11000) {
+      return {
+        success: false,
+        message: "You already have a request for this team.",
+      };
+    }
+
+    return { success: false, message: "Failed to send request." };
+  }
+}
 
 // ============================================
 // REQUEST TO JOIN TEAM
@@ -143,6 +245,33 @@ export async function approveJoinRequest(
       return {
         success: false,
         message: `Team is full (${team.maxMembers}/${team.maxMembers} members).`,
+      };
+    }
+
+    // Get the requesting player's details
+    const requestingPlayer = await User.findById(request.userId);
+    if (!requestingPlayer) {
+      return { success: false, message: "Player not found." };
+    }
+
+    // Check if player has set their Town Hall level
+    if (!requestingPlayer.townHall) {
+      return {
+        success: false,
+        message: "Player must set their Town Hall level before joining a team.",
+      };
+    }
+
+    // Get current team members for TH validation
+    const teamMembers = await User.find({ teamId: request.teamId }).select("townHall").lean();
+    const thCounts = getTHCounts(teamMembers);
+
+    // Validate TH restrictions
+    const thValidation = canPlayerJoinTeam(requestingPlayer.townHall, thCounts);
+    if (!thValidation.allowed) {
+      return {
+        success: false,
+        message: thValidation.reason || "Player cannot join due to Town Hall restrictions.",
       };
     }
 
