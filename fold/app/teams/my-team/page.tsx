@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import connectDB from "@/lib/mongodb";
 import { User, Team, JoinRequest } from "@/lib/models";
+import { getAvatarUrl } from "@/lib/avatar";
+import { getTHCounts, canPlayerJoinTeam } from "@/lib/th-validation";
 import {
   approveJoinRequest,
   rejectJoinRequest,
@@ -70,7 +72,7 @@ export default async function MyTeamPage() {
     teamId: user.teamId,
     status: "PENDING",
   })
-    .populate("userId", "name email")
+    .populate("userId", "name email townHall ign")
     .lean();
 
   if (!team) {
@@ -100,17 +102,76 @@ export default async function MyTeamPage() {
 
         {/* INVITE CODE CARD */}
         <Card className="bg-zinc-900 border-dashed border-zinc-700">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="text-xs text-zinc-500 uppercase tracking-widest font-bold">
-              Invite Code
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <div className="text-xs text-zinc-500 uppercase tracking-widest font-bold">
+                Invite Code
+              </div>
+              <div className="text-xl font-mono text-yellow-400 font-bold tracking-wider">
+                {team.teamCode}
+              </div>
+              <CopyCodeButton code={team.teamCode} />
             </div>
-            <div className="text-xl font-mono text-yellow-400 font-bold tracking-wider">
-              {team.teamCode}
-            </div>
-            <CopyCodeButton code={team.teamCode} />
+            <p className="text-xs text-zinc-500 mt-2">
+              Share this code with players. They can use it on the{" "}
+              <span className="text-yellow-400">Teams</span> page to request to join.
+            </p>
           </CardContent>
         </Card>
       </div>
+
+      {/* TH RESTRICTIONS INFO */}
+      {(() => {
+        const thCounts = getTHCounts(members.map(m => ({ townHall: m.townHall })));
+        // Calculate available slots
+        const th18Slots = 1;
+        const th17Slots = 1 + Math.max(0, th18Slots - thCounts.th18);
+        const th16Slots = 1 + Math.max(0, th17Slots - thCounts.th17);
+        const th15Slots = 1 + Math.max(0, th16Slots - thCounts.th16);
+        
+        return (
+          <Card className="bg-zinc-900/50 border-zinc-800">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-zinc-400">Town Hall Slot Availability</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <div className={`p-3 rounded-lg text-center ${thCounts.th18 >= th18Slots ? 'bg-red-500/20 border border-red-500/30' : 'bg-green-500/10 border border-green-500/20'}`}>
+                  <div className="text-lg font-bold text-white">TH 18</div>
+                  <div className={`text-sm ${thCounts.th18 >= th18Slots ? 'text-red-400' : 'text-green-400'}`}>
+                    {thCounts.th18}/{th18Slots} {thCounts.th18 >= th18Slots ? '(FULL)' : ''}
+                  </div>
+                </div>
+                <div className={`p-3 rounded-lg text-center ${thCounts.th17 >= th17Slots ? 'bg-red-500/20 border border-red-500/30' : 'bg-green-500/10 border border-green-500/20'}`}>
+                  <div className="text-lg font-bold text-white">TH 17</div>
+                  <div className={`text-sm ${thCounts.th17 >= th17Slots ? 'text-red-400' : 'text-green-400'}`}>
+                    {thCounts.th17}/{th17Slots} {thCounts.th17 >= th17Slots ? '(FULL)' : ''}
+                  </div>
+                </div>
+                <div className={`p-3 rounded-lg text-center ${thCounts.th16 >= th16Slots ? 'bg-red-500/20 border border-red-500/30' : 'bg-green-500/10 border border-green-500/20'}`}>
+                  <div className="text-lg font-bold text-white">TH 16</div>
+                  <div className={`text-sm ${thCounts.th16 >= th16Slots ? 'text-red-400' : 'text-green-400'}`}>
+                    {thCounts.th16}/{th16Slots} {thCounts.th16 >= th16Slots ? '(FULL)' : ''}
+                  </div>
+                </div>
+                <div className={`p-3 rounded-lg text-center ${thCounts.th15 >= th15Slots ? 'bg-red-500/20 border border-red-500/30' : 'bg-green-500/10 border border-green-500/20'}`}>
+                  <div className="text-lg font-bold text-white">TH 15</div>
+                  <div className={`text-sm ${thCounts.th15 >= th15Slots ? 'text-red-400' : 'text-green-400'}`}>
+                    {thCounts.th15}/{th15Slots} {thCounts.th15 >= th15Slots ? '(FULL)' : ''}
+                  </div>
+                </div>
+                <div className="p-3 rounded-lg text-center bg-blue-500/10 border border-blue-500/20">
+                  <div className="text-lg font-bold text-white">TH ≤14</div>
+                  <div className="text-sm text-blue-400">Unlimited</div>
+                </div>
+              </div>
+              <p className="text-xs text-zinc-500 mt-3">
+                💡 Unused high TH slots cascade down. E.g., if no TH 18, then TH 17 can have 2 players.
+              </p>
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       {/* PENDING JOIN REQUESTS - Leader Only */}
       {isLeader && pendingRequests.length > 0 && (
@@ -125,59 +186,87 @@ export default async function MyTeamPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {pendingRequests.map((request: any) => (
-                <div
-                  key={request._id.toString()}
-                  className="flex items-center justify-between p-3 bg-zinc-800 rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10 border border-zinc-700">
-                      <AvatarFallback>
-                        {getInitials(request.userId.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-white font-medium">
-                        {request.userId.name}
-                      </p>
-                      <p className="text-xs text-zinc-500">
-                        {request.userId.email}
-                      </p>
+              {pendingRequests.map((request: any) => {
+                const thCounts = getTHCounts(members.map(m => ({ townHall: m.townHall })));
+                const canJoin = canPlayerJoinTeam(request.userId.townHall, thCounts);
+                
+                return (
+                  <div
+                    key={request._id.toString()}
+                    className={`p-3 rounded-lg ${canJoin.allowed ? 'bg-zinc-800' : 'bg-red-900/20 border border-red-500/30'}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="w-10 h-10 border border-zinc-700">
+                          <AvatarFallback>
+                            {getInitials(request.userId.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="text-white font-medium flex items-center gap-2">
+                            {request.userId.name}
+                            {request.userId.townHall && (
+                              <Badge variant="outline" className="text-xs border-purple-500/50 text-purple-400">
+                                TH {request.userId.townHall}
+                              </Badge>
+                            )}
+                          </p>
+                          <p className="text-xs text-zinc-500">
+                            {request.userId.email}
+                            {request.userId.ign && ` • IGN: ${request.userId.ign}`}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        {canJoin.allowed ? (
+                          <form
+                            action={async () => {
+                              "use server";
+                              await approveJoinRequest(request._id.toString());
+                            }}
+                          >
+                            <Button
+                              size="sm"
+                              className="bg-green-500 hover:bg-green-600 text-white"
+                            >
+                              <CheckCircle className="w-4 h-4 mr-2" />
+                              Accept
+                            </Button>
+                          </form>
+                        ) : (
+                          <Button
+                            size="sm"
+                            disabled
+                            className="bg-zinc-700 text-zinc-400 cursor-not-allowed"
+                          >
+                            Cannot Accept
+                          </Button>
+                        )}
+                        <form
+                          action={async () => {
+                            "use server";
+                            await rejectJoinRequest(request._id.toString());
+                          }}
+                        >
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                          >
+                            <XCircle className="w-4 h-4 mr-2" />
+                            Reject
+                          </Button>
+                        </form>
+                      </div>
                     </div>
+                    {!canJoin.allowed && (
+                      <p className="text-xs text-red-400 mt-2">
+                        ⚠️ {canJoin.reason}
+                      </p>
+                    )}
                   </div>
-                  <div className="flex gap-2">
-                    <form
-                      action={async () => {
-                        "use server";
-                        await approveJoinRequest(request._id.toString());
-                      }}
-                    >
-                      <Button
-                        size="sm"
-                        className="bg-green-500 hover:bg-green-600 text-white"
-                      >
-                        <CheckCircle className="w-4 h-4 mr-2" />
-                        Accept
-                      </Button>
-                    </form>
-                    <form
-                      action={async () => {
-                        "use server";
-                        await rejectJoinRequest(request._id.toString());
-                      }}
-                    >
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                      >
-                        <XCircle className="w-4 h-4 mr-2" />
-                        Reject
-                      </Button>
-                    </form>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
@@ -210,7 +299,7 @@ export default async function MyTeamPage() {
                     <div className="flex items-center gap-3">
                       <Avatar className="h-9 w-9 border border-zinc-700">
                         <AvatarImage
-                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`}
+                          src={getAvatarUrl(member.avatarId, member.name)}
                         />
                         <AvatarFallback>
                           {getInitials(member.name)}

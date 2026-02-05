@@ -22,6 +22,7 @@ import {
   Menu,
 } from "lucide-react";
 import { auth, signOut } from "@/auth";
+import { getAvatarUrl } from "@/lib/avatar";
 
 export async function Navbar() {
   const session = await auth();
@@ -90,7 +91,7 @@ export async function Navbar() {
                       <div className="flex items-center gap-3 mb-4">
                         <Avatar className="h-10 w-10">
                           <AvatarImage
-                            src={user.image || ""}
+                            src={getAvatarUrl(user.avatarId, user.name || undefined)}
                             alt={user.name || ""}
                           />
                           <AvatarFallback className="bg-purple-600 text-white">
@@ -161,7 +162,7 @@ export async function Navbar() {
                   >
                     <Avatar className="h-10 w-10">
                       <AvatarImage
-                        src={user.image || ""}
+                        src={getAvatarUrl(user.avatarId, user.name || undefined)}
                         alt={user.name || ""}
                       />
                       <AvatarFallback className="bg-yellow-600 text-black font-bold">

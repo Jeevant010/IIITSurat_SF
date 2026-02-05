@@ -33,8 +33,9 @@ import {
   Send,
   Megaphone,
   Castle,
+  KeyRound,
 } from "lucide-react";
-import { requestToJoinTeam } from "@/app/actions/join-actions";
+import { requestToJoinTeam, joinTeamByCode } from "@/app/actions/join-actions";
 
 interface Team {
   id: string;
@@ -83,6 +84,55 @@ export function TeamsClient({
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [joinDialogOpen, setJoinDialogOpen] = useState(false);
   const [joinMessage, setJoinMessage] = useState("");
+
+  // Join by code state
+  const [joinByCodeDialogOpen, setJoinByCodeDialogOpen] = useState(false);
+  const [teamCode, setTeamCode] = useState("");
+  const [joinByCodeLoading, setJoinByCodeLoading] = useState(false);
+
+  const handleJoinByCode = async () => {
+    if (!currentUserId) {
+      toast.error("Login Required", {
+        description: "Please login to join a team",
+      });
+      return;
+    }
+
+    if (userTeamId) {
+      toast.warning("Already in Another Clan", {
+        description: "You need to leave your current clan first!",
+      });
+      return;
+    }
+
+    if (!teamCode.trim()) {
+      toast.error("Enter Team Code", {
+        description: "Please enter the invite code you received",
+      });
+      return;
+    }
+
+    setJoinByCodeLoading(true);
+    toast.loading("Looking up team...", { id: "join-by-code" });
+
+    const result = await joinTeamByCode(teamCode);
+
+    setJoinByCodeLoading(false);
+
+    if (result.success) {
+      setJoinByCodeDialogOpen(false);
+      setTeamCode("");
+      toast.success("Request Sent! 🎉", {
+        id: "join-by-code",
+        description: result.message,
+      });
+    } else {
+      toast.error("Failed to Join", {
+        id: "join-by-code",
+        description: result.message,
+      });
+    }
+  };
 
   const handleJoinRequest = async (teamId: string, message?: string) => {
     if (!currentUserId) {
@@ -177,6 +227,19 @@ export function TeamsClient({
     <div className="flex flex-col lg:flex-row gap-6">
       {/* Main Teams Grid */}
       <div className="flex-1 order-2 lg:order-1">
+        {/* Join by Code Button */}
+        <div className="mb-6 flex justify-center">
+          <Button
+            onClick={() => setJoinByCodeDialogOpen(true)}
+            variant="outline"
+            className="border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-400"
+            disabled={!!userTeamId || !currentUserId}
+          >
+            <KeyRound className="w-4 h-4 mr-2" />
+            Have an Invite Code?
+          </Button>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
           {teams.map((team) => {
             const buttonState = getButtonState(team);
@@ -431,6 +494,65 @@ export function TeamsClient({
               </Button>
               <Button
                 onClick={() => setJoinDialogOpen(false)}
+                variant="outline"
+                className="border-zinc-700"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Join by Code Dialog */}
+      <Dialog open={joinByCodeDialogOpen} onOpenChange={setJoinByCodeDialogOpen}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="w-5 h-5 text-yellow-500" />
+              Join with Invite Code
+            </DialogTitle>
+            <DialogDescription className="text-zinc-400">
+              Enter the team invite code that was shared with you to request to join.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div>
+              <Label className="text-zinc-300">Team Invite Code</Label>
+              <Input
+                placeholder="e.g., ABC123"
+                value={teamCode}
+                onChange={(e) => setTeamCode(e.target.value.toUpperCase())}
+                className="bg-black border-zinc-700 text-white mt-2 font-mono text-lg tracking-widest"
+                maxLength={10}
+              />
+              <p className="text-xs text-zinc-500 mt-1">
+                Ask your team leader for the invite code from their team page.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleJoinByCode}
+                disabled={joinByCodeLoading || !teamCode.trim()}
+                className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black font-bold"
+              >
+                {joinByCodeLoading ? (
+                  <>
+                    <Clock className="w-4 h-4 mr-2 animate-spin" />
+                    Looking up...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Request to Join
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={() => {
+                  setJoinByCodeDialogOpen(false);
+                  setTeamCode("");
+                }}
                 variant="outline"
                 className="border-zinc-700"
               >
