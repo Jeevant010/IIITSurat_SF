@@ -391,7 +391,9 @@ export default async function LeaderboardPage({
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="w-9 h-9">
-                              <AvatarImage src={getAvatarUrl(p.avatarId, p.name)} />
+                              <AvatarImage
+                                src={getAvatarUrl(p.avatarId, p.name)}
+                              />
                               <AvatarFallback className="bg-purple-600/50 text-white text-sm">
                                 {p.name?.charAt(0)?.toUpperCase()}
                               </AvatarFallback>

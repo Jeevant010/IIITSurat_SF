@@ -80,7 +80,9 @@ export default async function DashboardPage() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <Avatar className="w-16 h-16 border-4 border-purple-500/50">
-                <AvatarImage src={getAvatarUrl(currentUser.avatarId, currentUser.name)} />
+                <AvatarImage
+                  src={getAvatarUrl(currentUser.avatarId, currentUser.name)}
+                />
                 <AvatarFallback className="bg-purple-600 text-white text-xl">
                   {currentUser.name?.charAt(0)?.toUpperCase() || "?"}
                 </AvatarFallback>
@@ -275,7 +277,9 @@ export default async function DashboardPage() {
                             key={m._id.toString()}
                             className="w-8 h-8 border-2 border-zinc-900"
                           >
-                            <AvatarImage src={getAvatarUrl(m.avatarId, m.name)} />
+                            <AvatarImage
+                              src={getAvatarUrl(m.avatarId, m.name)}
+                            />
                             <AvatarFallback className="bg-purple-600 text-white text-xs">
                               {m.name.charAt(0)}
                             </AvatarFallback>
