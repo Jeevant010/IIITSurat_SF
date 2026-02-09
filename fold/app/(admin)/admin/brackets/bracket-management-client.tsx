@@ -56,8 +56,13 @@ type MatchStage =
   | "GROUP_A"
   | "GROUP_B"
   | "QUALIFIER_1"
-  | "ELIMINATOR"
   | "QUALIFIER_2"
+  | "ELIMINATOR_1"
+  | "ELIMINATOR_2"
+  | "QUALIFIER_3"
+  | "QUALIFIER_4"
+  | "SEMI_FINAL_1"
+  | "SEMI_FINAL_2"
   | "FINAL"
   | "KNOCKOUT";
 
@@ -192,9 +197,14 @@ export function BracketManagementClient({
     const stageNames: Record<MatchStage, string> = {
       GROUP_A: "🏟️ Group A",
       GROUP_B: "🏟️ Group B",
-      QUALIFIER_1: "⚡ Qualifier 1",
-      ELIMINATOR: "💥 Eliminator",
-      QUALIFIER_2: "⚡ Qualifier 2",
+      QUALIFIER_1: "⚡ Q1",
+      QUALIFIER_2: "⚡ Q2",
+      ELIMINATOR_1: "💥 E1",
+      ELIMINATOR_2: "💥 E2",
+      QUALIFIER_3: "🔥 Q3",
+      QUALIFIER_4: "🔥 Q4",
+      SEMI_FINAL_1: "🎯 SF1",
+      SEMI_FINAL_2: "🎯 SF2",
       FINAL: "🏆 Grand Final",
       KNOCKOUT: "⚔️ Knockout",
     };
@@ -206,8 +216,13 @@ export function BracketManagementClient({
       GROUP_A: "text-blue-400",
       GROUP_B: "text-purple-400",
       QUALIFIER_1: "text-yellow-400",
-      ELIMINATOR: "text-red-400",
-      QUALIFIER_2: "text-orange-400",
+      QUALIFIER_2: "text-yellow-300",
+      ELIMINATOR_1: "text-red-400",
+      ELIMINATOR_2: "text-red-300",
+      QUALIFIER_3: "text-orange-400",
+      QUALIFIER_4: "text-orange-300",
+      SEMI_FINAL_1: "text-cyan-400",
+      SEMI_FINAL_2: "text-cyan-300",
       FINAL: "text-yellow-500",
       KNOCKOUT: "text-zinc-400",
     };
@@ -221,8 +236,13 @@ export function BracketManagementClient({
     "GROUP_A",
     "GROUP_B",
     "QUALIFIER_1",
-    "ELIMINATOR",
     "QUALIFIER_2",
+    "ELIMINATOR_1",
+    "ELIMINATOR_2",
+    "QUALIFIER_3",
+    "QUALIFIER_4",
+    "SEMI_FINAL_1",
+    "SEMI_FINAL_2",
     "FINAL",
     "KNOCKOUT",
   ];
@@ -255,9 +275,14 @@ export function BracketManagementClient({
                   <SelectContent className="bg-zinc-800 border-zinc-700">
                     <SelectItem value="GROUP_A">Group A</SelectItem>
                     <SelectItem value="GROUP_B">Group B</SelectItem>
-                    <SelectItem value="QUALIFIER_1">Qualifier 1</SelectItem>
-                    <SelectItem value="ELIMINATOR">Eliminator</SelectItem>
-                    <SelectItem value="QUALIFIER_2">Qualifier 2</SelectItem>
+                    <SelectItem value="QUALIFIER_1">Qualifier 1 (Q1)</SelectItem>
+                    <SelectItem value="QUALIFIER_2">Qualifier 2 (Q2)</SelectItem>
+                    <SelectItem value="ELIMINATOR_1">Eliminator 1 (E1)</SelectItem>
+                    <SelectItem value="ELIMINATOR_2">Eliminator 2 (E2)</SelectItem>
+                    <SelectItem value="QUALIFIER_3">Qualifier 3 (Q3)</SelectItem>
+                    <SelectItem value="QUALIFIER_4">Qualifier 4 (Q4)</SelectItem>
+                    <SelectItem value="SEMI_FINAL_1">Semi-Final 1</SelectItem>
+                    <SelectItem value="SEMI_FINAL_2">Semi-Final 2</SelectItem>
                     <SelectItem value="FINAL">Final</SelectItem>
                     <SelectItem value="KNOCKOUT">Knockout</SelectItem>
                   </SelectContent>
@@ -373,7 +398,7 @@ export function BracketManagementClient({
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-zinc-500 mt-1">
-                  IPL: Groups → Qualifier 1 → Eliminator → Qualifier 2 → Final
+                  IPL Extended: Groups → Q1/Q2/E1/E2 → Q3/Q4 → SF1/SF2 → Final
                 </p>
               </div>
               <div>
@@ -383,33 +408,27 @@ export function BracketManagementClient({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-zinc-800 border-zinc-700">
-                    <SelectItem value="6">6 Teams (3+3 groups)</SelectItem>
+                    <SelectItem value="8">8 Teams (4+4 groups) - Recommended</SelectItem>
                     <SelectItem value="7">7 Teams (4+3 groups)</SelectItem>
-                    <SelectItem value="8">8 Teams (4+4 groups)</SelectItem>
-                    <SelectItem value="4">4 Teams (2+2 groups)</SelectItem>
+                    <SelectItem value="6">6 Teams (3+3 groups)</SelectItem>
+                    <SelectItem value="10">10 Teams (5+5 groups)</SelectItem>
+                    <SelectItem value="9">9 Teams (5+4 groups)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-3 space-y-2">
                 <p className="text-yellow-300 text-sm font-medium">
-                  🏆 IPL Format Explained:
+                  🏆 Extended Playoff Format (8 Teams):
                 </p>
                 <ul className="text-yellow-300/80 text-xs space-y-1 ml-2">
-                  <li>• Teams split into Group A & Group B</li>
-                  <li>
-                    • Group winners play <strong>Qualifier 1</strong> (Q1 winner
-                    → Final)
-                  </li>
-                  <li>
-                    • 2nd place teams play <strong>Eliminator</strong>
-                  </li>
-                  <li>
-                    • Q1 loser vs Eliminator winner ={" "}
-                    <strong>Qualifier 2</strong>
-                  </li>
-                  <li>
-                    • Q2 winner meets Q1 winner in <strong>Final</strong>
-                  </li>
+                  <li>• Teams split into Group A & Group B (4 each)</li>
+                  <li>• <strong>Q1:</strong> GA1 vs GB2 | <strong>Q2:</strong> GA2 vs GB1</li>
+                  <li>• <strong>E1:</strong> GA3 vs GB4 | <strong>E2:</strong> GA4 vs GB3</li>
+                  <li>• <strong>Q3:</strong> Q1 Loser vs E1 Winner → SF2</li>
+                  <li>• <strong>Q4:</strong> Q2 Loser vs E2 Winner → SF1</li>
+                  <li>• <strong>SF1:</strong> Q1 Winner vs Q4 Winner</li>
+                  <li>• <strong>SF2:</strong> Q2 Winner vs Q3 Winner</li>
+                  <li>• <strong>Final:</strong> SF1 Winner vs SF2 Winner</li>
                 </ul>
               </div>
               <div className="bg-red-500/10 border border-red-500/30 rounded p-3">
@@ -617,9 +636,14 @@ export function BracketManagementClient({
                   <SelectContent className="bg-zinc-800 border-zinc-700">
                     <SelectItem value="GROUP_A">Group A</SelectItem>
                     <SelectItem value="GROUP_B">Group B</SelectItem>
-                    <SelectItem value="QUALIFIER_1">Qualifier 1</SelectItem>
-                    <SelectItem value="ELIMINATOR">Eliminator</SelectItem>
-                    <SelectItem value="QUALIFIER_2">Qualifier 2</SelectItem>
+                    <SelectItem value="QUALIFIER_1">Qualifier 1 (Q1)</SelectItem>
+                    <SelectItem value="QUALIFIER_2">Qualifier 2 (Q2)</SelectItem>
+                    <SelectItem value="ELIMINATOR_1">Eliminator 1 (E1)</SelectItem>
+                    <SelectItem value="ELIMINATOR_2">Eliminator 2 (E2)</SelectItem>
+                    <SelectItem value="QUALIFIER_3">Qualifier 3 (Q3)</SelectItem>
+                    <SelectItem value="QUALIFIER_4">Qualifier 4 (Q4)</SelectItem>
+                    <SelectItem value="SEMI_FINAL_1">Semi-Final 1</SelectItem>
+                    <SelectItem value="SEMI_FINAL_2">Semi-Final 2</SelectItem>
                     <SelectItem value="FINAL">Final</SelectItem>
                     <SelectItem value="KNOCKOUT">Knockout</SelectItem>
                   </SelectContent>

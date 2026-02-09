@@ -163,62 +163,120 @@ export async function generateBracket(formData: FormData) {
   }
 }
 
-// IPL-style bracket: Groups + Qualifiers + Eliminators + Final
+// IPL-style bracket: Groups + Extended Playoffs for 8 teams
+// Round 1: Q1 (GA1 vs GB2), Q2 (GA2 vs GB1), E1 (GA3 vs GB4), E2 (GA4 vs GB3)
+// Round 2: Q3 (Loser Q1 vs Winner E1), Q4 (Loser Q2 vs Winner E2)
+// Semi-Finals: SF1 (Winner Q1 vs Winner Q4), SF2 (Winner Q2 vs Winner Q3)
+// Final: Winner SF1 vs Winner SF2
 async function generateIPLBracket(teamCount: number) {
   const groupASize = Math.ceil(teamCount / 2);
   const groupBSize = Math.floor(teamCount / 2);
 
   let matchNumber = 1;
-  const createdMatches: Record<string, string> = {};
 
-  // Create knockout stage matches first (to get IDs for linking)
-  // Final
+  // ============================================
+  // Create playoff matches in reverse order (to get IDs for linking)
+  // ============================================
+
+  // 1. FINAL
   const finalMatch = await Match.create({
     tournamentName: "Spring Fiesta 2026",
     stage: "FINAL",
     round: 1,
     matchNumber: matchNumber++,
     status: "TBD",
-    notes: "🏆 Championship Final",
+    notes: "🏆 Grand Final - SF1 Winner vs SF2 Winner",
   });
-  createdMatches["FINAL"] = finalMatch._id.toString();
 
-  // Qualifier 2 (winner goes to Final)
-  const q2Match = await Match.create({
+  // 2. SEMI-FINALS
+  const sf1Match = await Match.create({
     tournamentName: "Spring Fiesta 2026",
-    stage: "QUALIFIER_2",
+    stage: "SEMI_FINAL_1",
     round: 1,
     matchNumber: matchNumber++,
     status: "TBD",
     nextMatchId: finalMatch._id,
-    notes: "Qualifier 2 - Winner to Final",
+    notes: "Semi-Final 1 - Q1 Winner vs Q4 Winner → Final",
   });
-  createdMatches["Q2"] = q2Match._id.toString();
 
-  // Qualifier 1 (winner to Final, loser to Q2)
+  const sf2Match = await Match.create({
+    tournamentName: "Spring Fiesta 2026",
+    stage: "SEMI_FINAL_2",
+    round: 1,
+    matchNumber: matchNumber++,
+    status: "TBD",
+    nextMatchId: finalMatch._id,
+    notes: "Semi-Final 2 - Q2 Winner vs Q3 Winner → Final",
+  });
+
+  // 3. QUALIFIER 3 & 4 (Second chance qualifiers)
+  const q3Match = await Match.create({
+    tournamentName: "Spring Fiesta 2026",
+    stage: "QUALIFIER_3",
+    round: 1,
+    matchNumber: matchNumber++,
+    status: "TBD",
+    nextMatchId: sf2Match._id,
+    notes: "Qualifier 3 - Q1 Loser vs E1 Winner → SF2",
+  });
+
+  const q4Match = await Match.create({
+    tournamentName: "Spring Fiesta 2026",
+    stage: "QUALIFIER_4",
+    round: 1,
+    matchNumber: matchNumber++,
+    status: "TBD",
+    nextMatchId: sf1Match._id,
+    notes: "Qualifier 4 - Q2 Loser vs E2 Winner → SF1",
+  });
+
+  // 4. QUALIFIER 1 & 2 (First qualifiers)
   const q1Match = await Match.create({
     tournamentName: "Spring Fiesta 2026",
     stage: "QUALIFIER_1",
     round: 1,
     matchNumber: matchNumber++,
     status: "TBD",
-    nextMatchId: finalMatch._id,
-    loserNextMatchId: q2Match._id,
-    notes: "Qualifier 1 - Winner to Final, Loser to Qualifier 2",
+    nextMatchId: sf1Match._id,
+    loserNextMatchId: q3Match._id,
+    notes: "Qualifier 1 - GA1 vs GB2 → Winner to SF1, Loser to Q3",
   });
-  createdMatches["Q1"] = q1Match._id.toString();
 
-  // Eliminator (winner to Q2)
-  const eliminatorMatch = await Match.create({
+  const q2Match = await Match.create({
     tournamentName: "Spring Fiesta 2026",
-    stage: "ELIMINATOR",
+    stage: "QUALIFIER_2",
     round: 1,
     matchNumber: matchNumber++,
     status: "TBD",
-    nextMatchId: q2Match._id,
-    notes: "Eliminator - Winner to Qualifier 2",
+    nextMatchId: sf2Match._id,
+    loserNextMatchId: q4Match._id,
+    notes: "Qualifier 2 - GA2 vs GB1 → Winner to SF2, Loser to Q4",
   });
-  createdMatches["ELIMINATOR"] = eliminatorMatch._id.toString();
+
+  // 5. ELIMINATOR 1 & 2 (for 3rd/4th place teams)
+  const e1Match = await Match.create({
+    tournamentName: "Spring Fiesta 2026",
+    stage: "ELIMINATOR_1",
+    round: 1,
+    matchNumber: matchNumber++,
+    status: "TBD",
+    nextMatchId: q3Match._id,
+    notes: "Eliminator 1 - GA3 vs GB4 → Winner to Q3, Loser OUT",
+  });
+
+  const e2Match = await Match.create({
+    tournamentName: "Spring Fiesta 2026",
+    stage: "ELIMINATOR_2",
+    round: 1,
+    matchNumber: matchNumber++,
+    status: "TBD",
+    nextMatchId: q4Match._id,
+    notes: "Eliminator 2 - GA4 vs GB3 → Winner to Q4, Loser OUT",
+  });
+
+  // ============================================
+  // Create Group Stage Matches
+  // ============================================
 
   // Group A round-robin matches
   const groupAMatchCount = (groupASize * (groupASize - 1)) / 2;
@@ -250,9 +308,10 @@ async function generateIPLBracket(teamCount: number) {
   revalidatePath("/brackets");
 
   const totalMatches = matchNumber - 1;
+  const playoffMatches = 9; // Q1, Q2, E1, E2, Q3, Q4, SF1, SF2, Final
   return {
     success: true,
-    message: `Generated IPL-style bracket: ${groupAMatchCount} Group A + ${groupBMatchCount} Group B + 4 Playoff matches = ${totalMatches} total matches`,
+    message: `Generated IPL-style bracket: ${groupAMatchCount} Group A + ${groupBMatchCount} Group B + ${playoffMatches} Playoff matches = ${totalMatches} total`,
   };
 }
 

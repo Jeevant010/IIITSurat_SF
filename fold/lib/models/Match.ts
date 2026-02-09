@@ -1,12 +1,22 @@
 import mongoose, { Schema, model, models } from "mongoose";
 
 // Tournament stages for IPL-style format
+// Extended format for 8 teams (4 per group):
+// Round 1: Q1 (GA1 vs GB2), Q2 (GA2 vs GB1), E1 (GA3 vs GB4), E2 (GA4 vs GB3)
+// Round 2: Q3 (Loser Q1 vs Winner E1), Q4 (Loser Q2 vs Winner E2)
+// Semi-Finals: SF1 (Winner Q1 vs Winner Q4), SF2 (Winner Q2 vs Winner Q3)
+// Final: Winner SF1 vs Winner SF2
 export type MatchStage =
   | "GROUP_A" // Group A league matches
   | "GROUP_B" // Group B league matches
-  | "QUALIFIER_1" // Top teams from each group
-  | "ELIMINATOR" // 2nd place teams
-  | "QUALIFIER_2" // Loser of Q1 vs Winner of Eliminator
+  | "QUALIFIER_1" // GA1 vs GB2 - Winner to SF1, Loser to Q3
+  | "QUALIFIER_2" // GA2 vs GB1 - Winner to SF2, Loser to Q4
+  | "ELIMINATOR_1" // GA3 vs GB4 - Winner to Q3, Loser eliminated
+  | "ELIMINATOR_2" // GA4 vs GB3 - Winner to Q4, Loser eliminated
+  | "QUALIFIER_3" // Loser Q1 vs Winner E1 - Winner to SF2
+  | "QUALIFIER_4" // Loser Q2 vs Winner E2 - Winner to SF1
+  | "SEMI_FINAL_1" // Winner Q1 vs Winner Q4
+  | "SEMI_FINAL_2" // Winner Q2 vs Winner Q3
   | "FINAL" // Championship match
   | "KNOCKOUT"; // Generic knockout for simple brackets
 
@@ -47,8 +57,13 @@ const MatchSchema = new Schema<IMatch>(
         "GROUP_A",
         "GROUP_B",
         "QUALIFIER_1",
-        "ELIMINATOR",
         "QUALIFIER_2",
+        "ELIMINATOR_1",
+        "ELIMINATOR_2",
+        "QUALIFIER_3",
+        "QUALIFIER_4",
+        "SEMI_FINAL_1",
+        "SEMI_FINAL_2",
         "FINAL",
         "KNOCKOUT",
       ],

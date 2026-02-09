@@ -221,8 +221,13 @@ function MatchCard({
       GROUP_A: "bg-blue-500/20 text-blue-300 border-blue-500/30",
       GROUP_B: "bg-purple-500/20 text-purple-300 border-purple-500/30",
       QUALIFIER_1: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
-      ELIMINATOR: "bg-red-500/20 text-red-300 border-red-500/30",
-      QUALIFIER_2: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+      QUALIFIER_2: "bg-yellow-600/20 text-yellow-200 border-yellow-600/30",
+      ELIMINATOR_1: "bg-red-500/20 text-red-300 border-red-500/30",
+      ELIMINATOR_2: "bg-red-600/20 text-red-200 border-red-600/30",
+      QUALIFIER_3: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+      QUALIFIER_4: "bg-orange-600/20 text-orange-200 border-orange-600/30",
+      SEMI_FINAL_1: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
+      SEMI_FINAL_2: "bg-cyan-600/20 text-cyan-200 border-cyan-600/30",
       FINAL:
         "bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-300 border-yellow-500/30",
       KNOCKOUT: "bg-zinc-500/20 text-zinc-300 border-zinc-500/30",
@@ -235,8 +240,13 @@ function MatchCard({
       GROUP_A: "Group A",
       GROUP_B: "Group B",
       QUALIFIER_1: "Qualifier 1",
-      ELIMINATOR: "Eliminator",
       QUALIFIER_2: "Qualifier 2",
+      ELIMINATOR_1: "Eliminator 1",
+      ELIMINATOR_2: "Eliminator 2",
+      QUALIFIER_3: "Qualifier 3",
+      QUALIFIER_4: "Qualifier 4",
+      SEMI_FINAL_1: "Semi-Final 1",
+      SEMI_FINAL_2: "Semi-Final 2",
       FINAL: "🏆 Grand Final",
       KNOCKOUT: "Knockout",
     };
@@ -418,8 +428,13 @@ export default async function BracketsPage() {
   const groupAMatches = matches.filter((m) => m.stage === "GROUP_A");
   const groupBMatches = matches.filter((m) => m.stage === "GROUP_B");
   const q1Match = matches.find((m) => m.stage === "QUALIFIER_1");
-  const eliminatorMatch = matches.find((m) => m.stage === "ELIMINATOR");
   const q2Match = matches.find((m) => m.stage === "QUALIFIER_2");
+  const e1Match = matches.find((m) => m.stage === "ELIMINATOR_1");
+  const e2Match = matches.find((m) => m.stage === "ELIMINATOR_2");
+  const q3Match = matches.find((m) => m.stage === "QUALIFIER_3");
+  const q4Match = matches.find((m) => m.stage === "QUALIFIER_4");
+  const sf1Match = matches.find((m) => m.stage === "SEMI_FINAL_1");
+  const sf2Match = matches.find((m) => m.stage === "SEMI_FINAL_2");
   const finalMatch = matches.find((m) => m.stage === "FINAL");
   const knockoutMatches = matches.filter((m) => m.stage === "KNOCKOUT");
 
@@ -533,86 +548,161 @@ export default async function BracketsPage() {
             <section>
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
                 <Zap className="w-6 h-6 text-yellow-500" />
-                Playoffs
+                Playoffs - Extended Format
               </h2>
 
               {/* Playoff Bracket Visual */}
               <div className="bg-zinc-900/50 rounded-xl p-4 md:p-6 border border-yellow-500/20 overflow-x-auto">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 items-start min-w-[600px] md:min-w-0">
-                  {/* Qualifier 1 */}
-                  <div className="text-center">
-                    <h3 className="text-sm font-semibold text-yellow-400 mb-3">
-                      Qualifier 1
-                    </h3>
-                    <p className="text-xs text-zinc-500 mb-2">
-                      1st Group A vs 1st Group B
-                    </p>
-                    {q1Match ? (
-                      <MatchCard match={q1Match} />
-                    ) : (
-                      <div className="bg-zinc-800 rounded-lg p-8 border border-dashed border-zinc-700">
-                        <p className="text-zinc-500 text-sm">TBD</p>
-                      </div>
-                    )}
-                    <p className="text-xs text-green-400 mt-2">
-                      Winner → Final
-                    </p>
-                  </div>
+                
+                {/* Round 1: Qualifiers & Eliminators */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-white mb-4 text-center">
+                    Round 1 - Qualifiers & Eliminators
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 min-w-[700px] md:min-w-0">
+                    {/* Q1 */}
+                    <div className="text-center">
+                      <h4 className="text-sm font-semibold text-yellow-400 mb-2">Q1</h4>
+                      <p className="text-xs text-zinc-500 mb-2">GA1 vs GB2</p>
+                      {q1Match ? (
+                        <MatchCard match={q1Match} />
+                      ) : (
+                        <div className="bg-zinc-800 rounded-lg p-6 border border-dashed border-zinc-700">
+                          <p className="text-zinc-500 text-sm">TBD</p>
+                        </div>
+                      )}
+                      <p className="text-xs text-green-400 mt-2">W→SF1 | L→Q3</p>
+                    </div>
 
-                  {/* Eliminator */}
-                  <div className="text-center">
-                    <h3 className="text-sm font-semibold text-red-400 mb-3">
-                      Eliminator
-                    </h3>
-                    <p className="text-xs text-zinc-500 mb-2">
-                      2nd Group A vs 2nd Group B
-                    </p>
-                    {eliminatorMatch ? (
-                      <MatchCard match={eliminatorMatch} />
-                    ) : (
-                      <div className="bg-zinc-800 rounded-lg p-8 border border-dashed border-zinc-700">
-                        <p className="text-zinc-500 text-sm">TBD</p>
-                      </div>
-                    )}
-                    <p className="text-xs text-zinc-500 mt-2">
-                      Loser eliminated
-                    </p>
-                  </div>
+                    {/* Q2 */}
+                    <div className="text-center">
+                      <h4 className="text-sm font-semibold text-yellow-400 mb-2">Q2</h4>
+                      <p className="text-xs text-zinc-500 mb-2">GA2 vs GB1</p>
+                      {q2Match ? (
+                        <MatchCard match={q2Match} />
+                      ) : (
+                        <div className="bg-zinc-800 rounded-lg p-6 border border-dashed border-zinc-700">
+                          <p className="text-zinc-500 text-sm">TBD</p>
+                        </div>
+                      )}
+                      <p className="text-xs text-green-400 mt-2">W→SF2 | L→Q4</p>
+                    </div>
 
-                  {/* Qualifier 2 */}
-                  <div className="text-center">
-                    <h3 className="text-sm font-semibold text-orange-400 mb-3">
-                      Qualifier 2
-                    </h3>
-                    <p className="text-xs text-zinc-500 mb-2">
-                      Q1 Loser vs Eliminator Winner
-                    </p>
-                    {q2Match ? (
-                      <MatchCard match={q2Match} />
-                    ) : (
-                      <div className="bg-zinc-800 rounded-lg p-8 border border-dashed border-zinc-700">
-                        <p className="text-zinc-500 text-sm">TBD</p>
-                      </div>
-                    )}
-                    <p className="text-xs text-green-400 mt-2">
-                      Winner → Final
-                    </p>
-                  </div>
+                    {/* E1 */}
+                    <div className="text-center">
+                      <h4 className="text-sm font-semibold text-red-400 mb-2">E1</h4>
+                      <p className="text-xs text-zinc-500 mb-2">GA3 vs GB4</p>
+                      {e1Match ? (
+                        <MatchCard match={e1Match} />
+                      ) : (
+                        <div className="bg-zinc-800 rounded-lg p-6 border border-dashed border-zinc-700">
+                          <p className="text-zinc-500 text-sm">TBD</p>
+                        </div>
+                      )}
+                      <p className="text-xs text-orange-400 mt-2">W→Q3 | L OUT</p>
+                    </div>
 
-                  {/* Final */}
-                  <div className="text-center">
-                    <h3 className="text-sm font-semibold text-yellow-400 mb-3">
-                      🏆 Grand Final
-                    </h3>
-                    <p className="text-xs text-zinc-500 mb-2">
-                      Q1 Winner vs Q2 Winner
-                    </p>
+                    {/* E2 */}
+                    <div className="text-center">
+                      <h4 className="text-sm font-semibold text-red-400 mb-2">E2</h4>
+                      <p className="text-xs text-zinc-500 mb-2">GA4 vs GB3</p>
+                      {e2Match ? (
+                        <MatchCard match={e2Match} />
+                      ) : (
+                        <div className="bg-zinc-800 rounded-lg p-6 border border-dashed border-zinc-700">
+                          <p className="text-zinc-500 text-sm">TBD</p>
+                        </div>
+                      )}
+                      <p className="text-xs text-orange-400 mt-2">W→Q4 | L OUT</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Round 2: Second Chance Qualifiers */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-white mb-4 text-center">
+                    Round 2 - Second Chance
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+                    {/* Q3 */}
+                    <div className="text-center">
+                      <h4 className="text-sm font-semibold text-orange-400 mb-2">Q3</h4>
+                      <p className="text-xs text-zinc-500 mb-2">Q1 Loser vs E1 Winner</p>
+                      {q3Match ? (
+                        <MatchCard match={q3Match} />
+                      ) : (
+                        <div className="bg-zinc-800 rounded-lg p-6 border border-dashed border-zinc-700">
+                          <p className="text-zinc-500 text-sm">TBD</p>
+                        </div>
+                      )}
+                      <p className="text-xs text-green-400 mt-2">Winner → SF2</p>
+                    </div>
+
+                    {/* Q4 */}
+                    <div className="text-center">
+                      <h4 className="text-sm font-semibold text-orange-400 mb-2">Q4</h4>
+                      <p className="text-xs text-zinc-500 mb-2">Q2 Loser vs E2 Winner</p>
+                      {q4Match ? (
+                        <MatchCard match={q4Match} />
+                      ) : (
+                        <div className="bg-zinc-800 rounded-lg p-6 border border-dashed border-zinc-700">
+                          <p className="text-zinc-500 text-sm">TBD</p>
+                        </div>
+                      )}
+                      <p className="text-xs text-green-400 mt-2">Winner → SF1</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Semi-Finals */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-white mb-4 text-center">
+                    Semi-Finals
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+                    {/* SF1 */}
+                    <div className="text-center">
+                      <h4 className="text-sm font-semibold text-cyan-400 mb-2">SF1</h4>
+                      <p className="text-xs text-zinc-500 mb-2">Q1 Winner vs Q4 Winner</p>
+                      {sf1Match ? (
+                        <MatchCard match={sf1Match} />
+                      ) : (
+                        <div className="bg-zinc-800 rounded-lg p-6 border border-dashed border-zinc-700">
+                          <p className="text-zinc-500 text-sm">TBD</p>
+                        </div>
+                      )}
+                      <p className="text-xs text-green-400 mt-2">Winner → Final</p>
+                    </div>
+
+                    {/* SF2 */}
+                    <div className="text-center">
+                      <h4 className="text-sm font-semibold text-cyan-400 mb-2">SF2</h4>
+                      <p className="text-xs text-zinc-500 mb-2">Q2 Winner vs Q3 Winner</p>
+                      {sf2Match ? (
+                        <MatchCard match={sf2Match} />
+                      ) : (
+                        <div className="bg-zinc-800 rounded-lg p-6 border border-dashed border-zinc-700">
+                          <p className="text-zinc-500 text-sm">TBD</p>
+                        </div>
+                      )}
+                      <p className="text-xs text-green-400 mt-2">Winner → Final</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Final */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-yellow-400 mb-4 text-center">
+                    🏆 Grand Final
+                  </h3>
+                  <div className="max-w-md mx-auto text-center">
+                    <p className="text-xs text-zinc-500 mb-2">SF1 Winner vs SF2 Winner</p>
                     {finalMatch ? (
                       <MatchCard match={finalMatch} />
                     ) : (
                       <div className="bg-zinc-800 rounded-lg p-8 border border-dashed border-yellow-500/30">
-                        <Trophy className="w-8 h-8 text-yellow-500/50 mx-auto mb-2" />
-                        <p className="text-zinc-500 text-sm">Championship</p>
+                        <Trophy className="w-10 h-10 text-yellow-500/50 mx-auto mb-2" />
+                        <p className="text-zinc-500 text-sm">Championship Match</p>
                       </div>
                     )}
                   </div>
@@ -620,27 +710,29 @@ export default async function BracketsPage() {
 
                 {/* Playoff Flow Explanation */}
                 <div className="mt-8 p-4 bg-zinc-800/50 rounded-lg">
-                  <h4 className="text-sm font-semibold text-white mb-2">
-                    IPL Format Explanation:
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    Extended Playoff Format (8 Teams):
                   </h4>
-                  <ul className="text-xs text-zinc-400 space-y-1">
-                    <li>
-                      • <span className="text-yellow-400">Qualifier 1:</span>{" "}
-                      Top teams battle. Winner goes directly to the Final.
-                    </li>
-                    <li>
-                      • <span className="text-red-400">Eliminator:</span> 2nd
-                      place teams fight. Loser is eliminated.
-                    </li>
-                    <li>
-                      • <span className="text-orange-400">Qualifier 2:</span> Q1
-                      loser gets second chance vs Eliminator winner.
-                    </li>
-                    <li>
-                      • <span className="text-yellow-400">Final:</span> Q1
-                      Winner vs Q2 Winner for the championship!
-                    </li>
-                  </ul>
+                  <div className="grid md:grid-cols-2 gap-4 text-xs text-zinc-400">
+                    <div>
+                      <p className="font-medium text-white mb-1">Round 1:</p>
+                      <ul className="space-y-1 ml-2">
+                        <li>• <span className="text-yellow-400">Q1:</span> GA1 vs GB2 (Top teams crossed)</li>
+                        <li>• <span className="text-yellow-400">Q2:</span> GA2 vs GB1 (2nd place crossed)</li>
+                        <li>• <span className="text-red-400">E1:</span> GA3 vs GB4 (Eliminators)</li>
+                        <li>• <span className="text-red-400">E2:</span> GA4 vs GB3 (Eliminators)</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="font-medium text-white mb-1">Knockout Rounds:</p>
+                      <ul className="space-y-1 ml-2">
+                        <li>• <span className="text-orange-400">Q3:</span> Q1 Loser vs E1 Winner → SF2</li>
+                        <li>• <span className="text-orange-400">Q4:</span> Q2 Loser vs E2 Winner → SF1</li>
+                        <li>• <span className="text-cyan-400">SF1:</span> Q1 Winner vs Q4 Winner</li>
+                        <li>• <span className="text-cyan-400">SF2:</span> Q2 Winner vs Q3 Winner</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>
